@@ -1,8 +1,10 @@
 import React from 'react'
 import gsap from 'gsap';
-import { useMediaQuery } from 'react-responsive'
+import { useMediaQuery } from "react-responsive";
 import { useGSAP } from '@gsap/react'
 import { featureLists, goodLists } from '../../constants/index.js'
+import { ScrollTrigger } from 'gsap/all';
+gsap.registerPlugin(ScrollTrigger);
 
 const Art = () => {
  const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -16,7 +18,7 @@ const Art = () => {
 		start,
 		end: 'bottom center',
 		scrub: 1.5,
-		pin: true
+		pin: true,
 	 }
 	})
 	
