@@ -377,4 +377,36 @@ body {
             @apply absolute bottom-0 right-0 lg:w-96 w-1/3 pointer-events-none;
         }
     }
+
+    #productPage {
+        .left-leaf {
+            @apply absolute left-0 md:top-20 xl:top-36 2xl:top-52 md:bottom-auto -bottom-20 md:w-fit w-1/3;
+        }
+
+        .right-leaf {
+            @apply absolute right-0 md:bottom-0 xl:top-0 2xl:top-12 top-1/2 md:w-fit w-24;
+        }
+    }
+
+    @layer utilities {
+        @keyframes pulse-intense {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+
+            50% {
+                transform: scale(1.4);
+                opacity: 0.75;
+            }
+        }
+
+        .animate-pulse-intense {
+            animation: pulse-intense 2.5s ease-in-out infinite;
+        }
+    }
+
+
 }
