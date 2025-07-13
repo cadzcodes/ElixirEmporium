@@ -18,39 +18,40 @@ const cocktails = [
   { id: 6, name: 'Whiskey Sour', image: '/images/whiskeysour.png' },
 ]
 
-const CocktailGrid = () => {
-  const cardsRef = useRef([])
-  const wrapperRefs = useRef([])
-  const shadowRefs = useRef([])
+const CocktailGrid = ({ searchTerm }) => {
   const containerRef = useRef(null)
 
+  const filteredCocktails = cocktails.filter(c =>
+    c.name.toLowerCase().includes((searchTerm || '').toLowerCase())
+  )
+
+  // Animation on mount
   useEffect(() => {
     gsap.fromTo(
-      cardsRef.current,
-      { opacity: 0, y: 50 },
+      containerRef.current,
+      { opacity: 0 },
       {
         opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 80%',
-        },
+        duration: 0.5,
+        ease: 'power1.out',
       }
     )
-  }, [])
+  }, [searchTerm]) // fade only when searchTerm changes
+
+  const wrapperRefs = useRef([])
+  const shadowRefs = useRef([])
+
+  // Reset refs on render
+  wrapperRefs.current = []
+  shadowRefs.current = []
 
   const handleMouseEnter = (i) => {
     const color = getRandomBrightColor()
 
-    // Set shadow color immediately
     gsap.set(shadowRefs.current[i], {
       backgroundColor: color,
     })
 
-    // Animate wrapper (image + shadow together)
     gsap.to(wrapperRefs.current[i], {
       scale: 1.5,
       y: -20,
@@ -59,21 +60,10 @@ const CocktailGrid = () => {
       ease: 'power3.out',
     })
 
-    // Shadow fade in
     gsap.fromTo(
       shadowRefs.current[i],
-      {
-        opacity: 0,
-        x: 0,
-        y: 0,
-      },
-      {
-        opacity: 0.8,
-        x: 10,
-        y: 10,
-        duration: 0.4,
-        ease: 'power3.out',
-      }
+      { opacity: 0, x: 0, y: 0 },
+      { opacity: 0.8, x: 10, y: 10, duration: 0.4, ease: 'power3.out' }
     )
   }
 
@@ -100,51 +90,52 @@ const CocktailGrid = () => {
       ref={containerRef}
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
     >
-      {cocktails.map((cocktail, i) => (
-        <div
-          key={cocktail.id}
-          ref={(el) => (cardsRef.current[i] = el)}
-          className="relative bg-white/10 backdrop-blur-md p-4 rounded-2xl shadow-md transform transition-all duration-300 hover:bg-white/20 overflow-visible"
-          onMouseEnter={() => handleMouseEnter(i)}
-          onMouseLeave={() => handleMouseLeave(i)}
-        >
+      {filteredCocktails.length > 0 ? (
+        filteredCocktails.map((cocktail, i) => (
           <div
-            ref={(el) => (wrapperRefs.current[i] = el)}
-            className="relative h-48 w-full flex justify-center items-center overflow-visible"
+            key={cocktail.id}
+            className="relative bg-white/10 backdrop-blur-md p-4 rounded-2xl shadow-md transform transition-all duration-300 hover:bg-white/20 overflow-visible"
+            onMouseEnter={() => handleMouseEnter(i)}
+            onMouseLeave={() => handleMouseLeave(i)}
           >
-            {/* Colored shadow with image mask */}
             <div
-              ref={(el) => (shadowRefs.current[i] = el)}
-              className="absolute z-0 h-48 w-auto pointer-events-none"
-              style={{
-                WebkitMaskImage: `url(${cocktail.image})`,
-                maskImage: `url(${cocktail.image})`,
-                WebkitMaskRepeat: 'no-repeat',
-                maskRepeat: 'no-repeat',
-                WebkitMaskSize: 'contain',
-                maskSize: 'contain',
-                backgroundColor: 'transparent',
-                width: '100px',
-                height: '100%',
-              }}
-            />
+              ref={el => wrapperRefs.current[i] = el}
+              className="relative h-48 w-full flex justify-center items-center overflow-visible cursor-pointer"
+            >
+              <div
+                ref={el => shadowRefs.current[i] = el}
+                className="absolute z-0 h-48 w-auto pointer-events-none"
+                style={{
+                  WebkitMaskImage: `url(${cocktail.image})`,
+                  maskImage: `url(${cocktail.image})`,
+                  WebkitMaskRepeat: 'no-repeat',
+                  maskRepeat: 'no-repeat',
+                  WebkitMaskSize: 'contain',
+                  maskSize: 'contain',
+                  backgroundColor: 'transparent',
+                  width: '100px',
+                  height: '100%',
+                }}
+              />
+              <img
+                src={cocktail.image}
+                alt={cocktail.name}
+                className="relative z-10 object-contain h-48 transition-transform duration-300"
+              />
+            </div>
 
-            {/* Actual image */}
-            <img
-              src={cocktail.image}
-              alt={cocktail.name}
-              className="relative z-10 object-contain h-48 transition-transform duration-300"
-            />
+            <p className="font-modern-negra text-6xl text-yellow leading-none mt-4 text-center">
+              {cocktail.name}
+            </p>
           </div>
-
-          <p className="font-modern-negra text-6xl text-yellow leading-none mt-4 text-center">
-            {cocktail.name}
-          </p>
-        </div>
-      ))}
+        ))
+      ) : (
+        <p className="text-center col-span-full text-gray-400 text-xl">
+          No cocktails found.
+        </p>
+      )}
     </div>
   )
 }
 
 export default CocktailGrid
-  
