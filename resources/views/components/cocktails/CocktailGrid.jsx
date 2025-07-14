@@ -92,48 +92,54 @@ const CocktailGrid = ({ searchTerm }) => {
     >
       {filteredCocktails.length > 0 ? (
         filteredCocktails.map((cocktail, i) => (
-          <div
+          <a
             key={cocktail.id}
-            className="relative bg-white/10 backdrop-blur-md p-4 rounded-2xl shadow-md transform transition-all duration-300 hover:bg-white/20 overflow-visible"
-            onMouseEnter={() => handleMouseEnter(i)}
-            onMouseLeave={() => handleMouseLeave(i)}
+            href="/product"
+            className="block group" // ensures the anchor wraps properly
           >
             <div
-              ref={el => wrapperRefs.current[i] = el}
-              className="relative h-48 w-full flex justify-center items-center overflow-visible cursor-pointer"
+              className="relative bg-white/10 backdrop-blur-md p-4 rounded-2xl shadow-md transform transition-all duration-300 group-hover:bg-white/20 overflow-visible"
+              onMouseEnter={() => handleMouseEnter(i)}
+              onMouseLeave={() => handleMouseLeave(i)}
             >
               <div
-                ref={el => shadowRefs.current[i] = el}
-                className="absolute z-0 h-48 w-auto pointer-events-none"
-                style={{
-                  WebkitMaskImage: `url(${cocktail.image})`,
-                  maskImage: `url(${cocktail.image})`,
-                  WebkitMaskRepeat: 'no-repeat',
-                  maskRepeat: 'no-repeat',
-                  WebkitMaskSize: 'contain',
-                  maskSize: 'contain',
-                  backgroundColor: 'transparent',
-                  width: '100px',
-                  height: '100%',
-                }}
-              />
-              <img
-                src={cocktail.image}
-                alt={cocktail.name}
-                className="relative z-10 object-contain h-48 transition-transform duration-300"
-              />
-            </div>
+                ref={el => wrapperRefs.current[i] = el}
+                className="relative h-48 w-full flex justify-center items-center overflow-visible cursor-pointer"
+              >
+                <div
+                  ref={el => shadowRefs.current[i] = el}
+                  className="absolute z-0 h-48 w-auto pointer-events-none"
+                  style={{
+                    WebkitMaskImage: `url(${cocktail.image})`,
+                    maskImage: `url(${cocktail.image})`,
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                    backgroundColor: 'transparent',
+                    width: '100px',
+                    height: '100%',
+                  }}
+                />
+                <img
+                  src={cocktail.image}
+                  alt={cocktail.name}
+                  className="relative z-10 object-contain h-48 transition-transform duration-300"
+                />
+              </div>
 
-            <p className="font-modern-negra text-6xl text-yellow leading-none mt-4 text-center">
-              {cocktail.name}
-            </p>
-          </div>
+              <p className="font-modern-negra text-6xl text-yellow leading-none mt-4 text-center">
+                {cocktail.name}
+              </p>
+            </div>
+          </a>
         ))
       ) : (
         <p className="text-center col-span-full text-gray-400 text-xl">
           No cocktails found.
         </p>
       )}
+
     </div>
   )
 }

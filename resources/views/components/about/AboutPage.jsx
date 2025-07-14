@@ -18,7 +18,7 @@ const AboutPage = () => {
       h1,
       { text: '' },
       {
-        duration: 4,
+        duration: 2,
         text: 'About Our Craft',
         ease: 'power2.out',
         delay: 0.3,

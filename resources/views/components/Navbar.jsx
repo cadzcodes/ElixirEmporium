@@ -72,8 +72,8 @@ const Navbar = () => {
           ))}
           <li>
             <div className="flex items-center gap-2">
-              <a href="#login" className="px-4 py-2 border border-white rounded-full hover:border-yellow transition">Login</a>
-              <a href="#signup" className="px-4 py-2 bg-yellow text-black rounded-full font-semibold hover:bg-white transition">Sign Up</a>
+              <a href="/login" className="px-4 py-2 border border-white rounded-full hover:border-yellow transition">Login</a>
+              <a href="/signup" className="px-4 py-2 bg-yellow text-black rounded-full font-semibold hover:bg-white transition">Sign Up</a>
             </div>
           </li>
         </ul>
@@ -100,10 +100,10 @@ const Navbar = () => {
           </li>
         ))}
         <li>
-          <a href="#login" className="px-4 py-2 border border-white rounded-full hover:border-yellow transition">Login</a>
+          <a href="/login" className="px-4 py-2 border border-white rounded-full hover:border-yellow transition">Login</a>
         </li>
         <li>
-          <a href="#signup" className="px-4 py-2 bg-yellow text-black rounded-full font-semibold hover:bg-white transition">Sign Up</a>
+          <a href="/signup" className="px-4 py-2 bg-yellow text-black rounded-full font-semibold hover:bg-white transition">Sign Up</a>
         </li>
       </ul>
     </nav>
