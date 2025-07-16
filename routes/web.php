@@ -30,3 +30,11 @@ Route::get('/art', function () {
 Route::get('/contact', function () {
     return view('contact');
 });
+
+Route::get('/cart', function () {
+    return view('cart');
+});
+
+Route::get('/checkout', function () {
+    return view('checkout');
+});
