@@ -22,7 +22,11 @@ Route::get('/login', function () {
     return view('auth/login');
 });
 
-
 Route::get('/art', function () {
     return view('art');
+});
+
+
+Route::get('/contact', function () {
+    return view('contact');
 });
