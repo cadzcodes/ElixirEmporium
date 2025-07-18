@@ -1,61 +1,152 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
+import gsap from 'gsap'
+import AlertDialog from "../reusables/AlertDialog"
 
-const SignupForm = ({ formRef, handleSignup }) => (
-  <div className="md:col-span-2 flex items-center justify-center px-6 py-16 relative z-10">
-    <div
-      ref={formRef}
-      className="w-full max-w-md bg-[#1a1a1a] rounded-2xl shadow-2xl p-10 space-y-6"
-    >
-      <div className="text-center mb-6">
-        <h1 className="text-4xl font-modern-negra text-yellow">Create Account</h1>
-        <p className="text-gray-400 text-sm">Sign up to start your Elixir journey.</p>
-      </div>
+const SignupForm = ({ formRef }) => {
+    const [form, setForm] = useState({ name: '', email: '', password: '' })
+    const [errors, setErrors] = useState({})
+    const [touched, setTouched] = useState({})
+    const [status, setStatus] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [alert, setAlert] = useState(null)
 
-      <form className="space-y-5" onSubmit={handleSignup}>
-        <div>
-          <label htmlFor="name" className="text-sm text-gray-300 mb-1 block">Name</label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Full Name"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-yellow"
-          />
-        </div>
-        <div>
-          <label htmlFor="email" className="text-sm text-gray-300 mb-1 block">Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="you@example.com"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-yellow"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="text-sm text-gray-300 mb-1 block">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="••••••••"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-yellow"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-yellow text-black font-semibold py-3 rounded-lg hover:bg-white transition duration-300 shadow-lg"
-        >
-          Sign Up
-        </button>
-      </form>
+    const buttonRef = useRef(null)
 
-      <div className="text-center text-sm text-gray-500 pt-4">
-        Already have an account?{' '}
-        <a href="#" className="text-yellow hover:underline">Login</a>
-      </div>
-    </div>
-  </div>
-)
+    const handleInput = (e) => {
+        const { id, value } = e.target
+        setForm({ ...form, [id]: value })
+    }
+
+    const handleBlur = (e) => {
+        const { id } = e.target
+        setTouched({ ...touched, [id]: true })
+    }
+
+    const handleSignup = async (e) => {
+        e.preventDefault()
+        setErrors({})
+        setStatus(null)
+        setLoading(true)
+
+        // Animate button on click
+        gsap.fromTo(buttonRef.current,
+            { scale: 1 },
+            { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1, ease: "power1.inOut" }
+        )
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(form)
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                if (data.errors) {
+                    setErrors(data.errors)
+                } else {
+                    setAlert({ type: 'error', message: 'Something went wrong. Please try again.' })
+                }
+            } else {
+                setAlert({ type: 'success', message: 'Registration successful!' })
+                setForm({ name: '', email: '', password: '' })
+                setTouched({})
+            }
+        } catch (error) {
+            console.error('Signup error:', error)
+            setAlert({ type: 'error', message: 'An unexpected error occurred.' })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const inputClass = (field) =>
+        `w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none ${errors[field] && touched[field]
+            ? 'ring-2 ring-red-500'
+            : 'focus:ring-2 focus:ring-yellow'
+        }`
+
+    return (
+        <div className="md:col-span-2 flex items-center justify-center px-6 py-16 relative z-10">
+
+            {alert && (
+                <AlertDialog
+                    type={alert.type}
+                    message={alert.message}
+                    onClose={() => setAlert(null)}
+                />
+            )}
+
+
+
+            <div
+                ref={formRef}
+                className="w-full max-w-md bg-[#1a1a1a] rounded-2xl shadow-2xl p-10 space-y-6"
+            >
+                <div className="text-center mb-6">
+                    <h1 className="text-4xl font-modern-negra text-yellow">Create Account</h1>
+                    <p className="text-gray-400 text-sm">Sign up to start your Elixir journey.</p>
+                </div>
+
+                <form className="space-y-5" onSubmit={handleSignup}>
+                    {['name', 'email', 'password'].map((field) => (
+                        <div key={field}>
+                            <label htmlFor={field} className="text-sm text-gray-300 mb-1 block capitalize">
+                                {field}
+                            </label>
+                            <input
+                                type={field === 'password' ? 'password' : field}
+                                id={field}
+                                value={form[field]}
+                                onChange={handleInput}
+                                onBlur={handleBlur}
+                                placeholder={field === 'name' ? 'Full Name' : field === 'email' ? 'you@example.com' : '••••••••'}
+                                required
+                                className={inputClass(field)}
+                            />
+                            {errors[field] && touched[field] && (
+                                <p className="text-red-500 text-xs mt-1">{errors[field][0]}</p>
+                            )}
+                        </div>
+                    ))}
+
+                    <button
+                        ref={buttonRef}
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full flex items-center justify-center gap-2 bg-yellow text-black font-semibold py-3 rounded-lg transition duration-300 shadow-lg hover:bg-white ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    >
+                        {loading ? (
+                            <>
+                                <span className="loader border-2 border-t-2 border-black w-5 h-5 rounded-full animate-spin"></span>
+                                Signing up...
+                            </>
+                        ) : (
+                            'Sign Up'
+                        )}
+                    </button>
+                </form>
+
+                {status && (
+                    <p className="text-red-500 text-sm text-center pt-4">{status}</p>
+                )}
+
+                <div className="text-center text-sm text-gray-500 pt-4">
+                    Already have an account?{' '}
+                    <a href="/login" className="text-yellow hover:underline">Login</a>
+                </div>
+            </div>
+        </div>
+
+
+    )
+}
 
 export default SignupForm

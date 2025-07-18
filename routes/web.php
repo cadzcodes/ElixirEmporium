@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,3 +43,6 @@ Route::get('/cart', function () {
 Route::get('/checkout', function () {
     return view('checkout');
 });
+
+// Submit Forms Routes
+Route::post('/register', [AuthController::class, 'register']);

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <link rel="icon" href="../images/logo.png" type="image/svg+xml">
-    <title>Cocktails - Elixir Emporium</title>
+    <title>Cart - Elixir Emporium</title>
      @vite(['resources/css/app.css', 'resources/views/CartPage.jsx'])
 </head>
 <body>

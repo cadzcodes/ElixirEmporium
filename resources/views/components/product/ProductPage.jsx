@@ -7,7 +7,7 @@ const ProductPage = () => {
       id="productPage"
     >
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-10 items-center z-10">
-        
+
         {/* Image Section — centered & spaced on mobile */}
         <div className="relative flex items-center justify-center w-full max-w-md aspect-square mx-auto mt-12 md:mt-0">
 
@@ -38,9 +38,13 @@ const ProductPage = () => {
             <span className="text-sm text-gray-400 line-through">$149.00</span>
           </div>
 
-          <button className="bg-yellow text-black px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-offset-2">
+          <a
+            href="/cart"
+            className=" cursor-pointer bg-yellow text-black px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-offset-2 text-center inline-block"
+          >
             Add to Cart
-          </button>
+          </a>
+
 
           <ul className="text-sm text-gray-400 pt-4 space-y-1">
             <li>✔️ Free shipping worldwide</li>

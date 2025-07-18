@@ -4,10 +4,12 @@ import ProductPage from "./components/product/ProductPage";
 import Navbar from "./components/Navbar";
 import ProductHighlights from "./components/product/ProductHighlights";
 import ProductCraft from "./components/product/ProductCraft";
+import SmoothFollower from "./components/Cursor";
 
 const Product = () => {
     return (
         <div>
+            <SmoothFollower />
             <Navbar />
             <ProductPage />
             <ProductHighlights />
