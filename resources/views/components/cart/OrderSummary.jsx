@@ -4,7 +4,7 @@ const OrderSummary = forwardRef(({ subtotal, shipping, total, hasSelection }, re
     return (
         <div
             ref={ref}
-            className="hidden lg:block sticky top-[100px] bg-[#1a1a1a] p-8 rounded-2xl shadow-2xl border border-yellow/30 h-fit"
+            className="hidden lg:block sticky top-[120px] bg-[#1a1a1a] p-8 rounded-2xl shadow-2xl border border-yellow/30 h-fit"
         >
 
             <h3 className="text-2xl font-semibold text-yellow mb-6 border-b border-yellow/20 pb-4">
@@ -25,15 +25,15 @@ const OrderSummary = forwardRef(({ subtotal, shipping, total, hasSelection }, re
                 </div>
             </div>
 
-            <button
-                disabled={!hasSelection}
-                className={`mt-8 w-full py-3 text-lg font-semibold rounded-full transition-all duration-300 ${hasSelection
+            <a
+                href="/checkout"
+                className={`mt-8 block text-center w-full py-3 text-lg font-semibold rounded-full transition-all duration-300 ${hasSelection
                     ? 'bg-yellow text-black hover:bg-white shadow-lg'
-                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-600 text-gray-400 pointer-events-none'
                     }`}
             >
                 Proceed to Checkout
-            </button>
+            </a>
         </div>
     );
 });
