@@ -27,7 +27,6 @@ body {
     background-color: black;
     color: white;
     scroll-behavior: smooth;
-    overflow-x: hidden;
 }
 
 @utility flex-center {
@@ -65,7 +64,7 @@ body {
 
 @layer components {
     main {
-        @apply w-full overflow-x-hidden;
+        @apply w-full;
     }
 
     nav {

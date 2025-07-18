@@ -3,12 +3,15 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ReactDOM from 'react-dom/client';
 import Navbar from "./components/Navbar";
+import AccordionItem from "./components/contact/AccordionItem";
+import SmoothFollower from "./components/Cursor";
 
 gsap.registerPlugin(ScrollTrigger)
 
 const ContactPage = () => {
     const formRef = useRef(null)
     const sectionRef = useRef(null)
+    const ctaRef = useRef(null)
 
     useEffect(() => {
         gsap.from(sectionRef.current, {
@@ -32,10 +35,22 @@ const ContactPage = () => {
                 start: 'top 80%',
             },
         })
+
+        gsap.from(ctaRef.current, {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: ctaRef.current,
+                start: 'top 80%',
+            },
+        })
     }, [])
 
     return (
         <div>
+            <SmoothFollower />
             <Navbar />
             <section className="bg-[#0e0e0e] text-white min-h-screen pt-40 pb-24 px-6 md:px-16 overflow-hidden">
 
@@ -99,7 +114,50 @@ const ContactPage = () => {
                 {/* Separator */}
                 <div className="mt-32 border-t border-yellow/20 w-1/2 mx-auto"></div>
 
-                {/* Contact Details Section */}
+                {/* Customer Support Section - Simple CTA Button */}
+                <div ref={ctaRef} className="mt-24 text-center text-white">
+                    <h3 className="text-3xl md:text-4xl font-modern-negra text-yellow mb-6">
+                        Need Immediate Assistance
+                    </h3>
+                    <p className="text-gray-400 text-lg mb-8">
+                        Our support team is available 24/7 to help you out.
+                    </p>
+                    <button
+                        onClick={() => alert('Launching support chat or redirecting...')}
+                        className="bg-yellow text-black font-semibold py-3 px-8 rounded-full hover:bg-white transition duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow"
+                    >
+                        Talk to Customer Support
+                    </button>
+                </div>
+
+                {/* Separator */}
+                <div className="mt-32 border-t border-yellow/20 w-1/2 mx-auto"></div>
+
+                {/* Customer Support Accordion */}
+                <div className="mt-24 text-center text-white max-w-3xl mx-auto space-y-6">
+                    <h3 className="text-3xl md:text-4xl font-modern-negra text-yellow mb-6">
+                        Customer Support
+                    </h3>
+                    <p className="text-gray-400 text-lg mb-8">
+                        Have questions? We have answers.
+                    </p>
+
+                    <AccordionItem
+                        question="What is the usual response time?"
+                        answer="Our team typically responds within 1–2 hours during business days."
+                    />
+                    <AccordionItem
+                        question="Can I modify my reservation?"
+                        answer="Yes, simply reach out via our contact form or use the support button above."
+                    />
+                    <AccordionItem
+                        question="Is walk-in service available?"
+                        answer="We encourage reservations; however, walk-ins are welcome based on availability."
+                    />
+                </div>
+
+
+                {/* Contact Details Section (Footer) */}
                 <div className="text-center mt-20 space-y-4 text-gray-400">
                     <p className="text-xl font-medium">📍 123 Velvet Ave, Golden City</p>
                     <p className="text-xl font-medium">📞 +1 (800) 555-ELXR</p>

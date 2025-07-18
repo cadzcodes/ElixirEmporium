@@ -64,7 +64,7 @@ const Navbar = () => {
         </a>
 
         {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-7 lg:gap-12 ml-auto">
+        <ul className="hidden lg:flex items-center gap-7 lg:gap-12 ml-auto">
           {navLinks.map(link => (
             <li key={link.id}>
               <a href={`${link.id}`}>{link.title}</a>
@@ -80,7 +80,7 @@ const Navbar = () => {
 
         {/* Hamburger (Mobile) */}
         <button
-          className="md:hidden text-white ml-auto"
+          className="lg:hidden text-white ml-auto"
           onClick={() => setIsOpen(prev => !prev)}
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -90,7 +90,7 @@ const Navbar = () => {
       {/* Mobile Dropdown */}
       <ul
         ref={dropdownRef}
-        className="md:hidden flex-col items-center gap-5 py-4 bg-black/90 backdrop-blur text-white transition-all hidden"
+        className="lg:hidden flex-col items-center gap-5 py-4 bg-black/90 backdrop-blur text-white transition-all hidden"
       >
         {navLinks.map(link => (
           <li key={link.id}>

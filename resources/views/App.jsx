@@ -7,12 +7,14 @@ import Cocktails from './components/Cocktails';
 import About from './components/About';
 import Art from './components/Art';
 import Menu from "./components/Menu";
+import SmoothFollower from "./components/Cursor";
 import Contact from "./components/Contact";
 
 const App = () => {
     return (
         <main>
-            <Navbar/>
+            <SmoothFollower />
+            <Navbar />
             <Hero />
             <Cocktails />
             <About />

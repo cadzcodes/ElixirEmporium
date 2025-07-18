@@ -2,10 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom/client';
 import Navbar from "./components/Navbar"
 import LoginPage from "./components/login/LoginPage"
+import SmoothFollower from "./components/Cursor";
 
 const Login = () => {
   return (
     <div>
+        <SmoothFollower />
         <Navbar />
         <LoginPage />
     </div>

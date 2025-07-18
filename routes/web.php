@@ -22,6 +22,10 @@ Route::get('/login', function () {
     return view('auth/login');
 });
 
+Route::get('/signup', function () {
+    return view('auth/signup');
+});
+
 Route::get('/art', function () {
     return view('art');
 });

@@ -8,6 +8,7 @@ import GallerySection from './components/art/GallerySection'
 import StatementSection from './components/art/StatementSection'
 import Separator from './components/art/Separator'
 import Navbar from "./components/Navbar";
+import SmoothFollower from "./components/Cursor";
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -36,6 +37,7 @@ const ArtPage = () => {
 
     return (
         <div className="bg-[#0e0e0e] text-white overflow-hidden max-w-full">
+            <SmoothFollower />
             <Navbar />
             <HeroSection />
             <div ref={(el) => (sectionsRef.current[0] = el)}>

@@ -10,10 +10,12 @@ import Menu from "./components/Menu";
 import Contact from "./components/Contact";
 import AboutPage from "./components/about/AboutPage";
 import Section from "./components/about/Section";
+import SmoothFollower from "./components/Cursor";
 
 const AboutCompile = () => {
     return (
         <main>
+            <SmoothFollower />
             <Navbar/>
             <AboutPage />
             <About />
