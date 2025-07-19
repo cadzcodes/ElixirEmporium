@@ -11,4 +11,8 @@
     <div id="checkoutPage"></div>
 </body>
 
+<script>
+    window.__USER__ = @json(Auth::user());
+</script>
+
 </html>

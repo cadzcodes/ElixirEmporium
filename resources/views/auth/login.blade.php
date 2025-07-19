@@ -11,5 +11,8 @@
 <body>
     <div id="login"></div>
 </body>
+<script>
+    window.__USER__ = @json(Auth::user());
+</script>
 
 </html>

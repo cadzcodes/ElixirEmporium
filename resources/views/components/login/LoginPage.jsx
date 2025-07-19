@@ -1,12 +1,16 @@
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import gsap from 'gsap'
 import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
+import AlertDialog from "../reusables/AlertDialog"
 
 const LoginPage = () => {
   const formRef = useRef(null)
   const toastRef = useRef(null)
   const [toggle, setToggle] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState(null)
+  const [alert, setAlert] = useState(null)
+  const buttonRef = useRef(null)
 
   // Initial animation
   useEffect(() => {
@@ -44,16 +48,60 @@ const LoginPage = () => {
     })
   }, [status])
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    const isSuccess = toggle
-    setStatus(isSuccess ? 'success' : 'error')
-    setToggle(!toggle)
+    setAlert(null)
+    setLoading(true)
+
+    gsap.fromTo(buttonRef.current,
+      { scale: 1 },
+      { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1, ease: "power1.inOut" }
+    )
+
+    try {
+      const formData = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+      }
+
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setAlert({ type: 'error', message: 'Invalid login credentials.' })
+      } else {
+        setAlert({ type: 'success', message: 'Login successful!' })
+        setTimeout(() => window.location.href = '/', 2000)
+      }
+    } catch (err) {
+      setAlert({ type: 'error', message: 'An error occurred. Please try again.' })
+    } finally {
+      setLoading(false)
+    }
   }
+
+
 
   return (
     <div className="relative min-h-screen bg-[#0e0e0e] flex items-center justify-center px-6 py-12 overflow-hidden">
-      
+
+      {alert && (
+        <AlertDialog
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
+
+
       {/* Background Blur */}
       <div className="absolute inset-0 bg-[url('/images/login-bg.jpg')] bg-cover bg-center opacity-10 blur-sm" />
 
@@ -131,11 +179,21 @@ const LoginPage = () => {
           </div>
 
           <button
+            ref={buttonRef}
             type="submit"
-            className="w-full bg-yellow text-black font-semibold py-3 rounded-lg hover:bg-white transition duration-300 shadow-lg"
+            disabled={loading}
+            className={`w-full flex items-center justify-center gap-2 bg-yellow text-black font-semibold py-3 rounded-lg hover:bg-white transition duration-300 shadow-lg ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Sign In
+            {loading ? (
+              <>
+                <span className="loader border-2 border-t-2 border-black w-5 h-5 rounded-full animate-spin"></span>
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
+
         </form>
 
         <div className="text-center text-sm text-gray-500 pt-4">

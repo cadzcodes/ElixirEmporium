@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\RedirectIfAuthenticatedToHome;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,10 +20,6 @@ Route::get('/product', function () {
 
 Route::get('/about', function () {
     return view('about');
-});
-
-Route::get('/login', function () {
-    return view('auth/login');
 });
 
 Route::get('/signup', function () {
@@ -46,3 +45,31 @@ Route::get('/checkout', function () {
 
 // Submit Forms Routes
 Route::post('/register', [AuthController::class, 'register']);
+
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+
+Route::middleware([RedirectIfAuthenticatedToHome::class])->group(function () {
+    Route::get('/login', function () {
+        return view('auth/login'); // Replace as needed for React/Blade
+    });
+
+    Route::get('/register', function () {
+        return view('auth/register');
+    });
+});
+
+Route::get('/user', function () {
+    return response()->json(Auth::user());
+});
+
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return response()->json(['message' => 'Logged out successfully'], 200);
+});
