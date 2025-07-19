@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RedirectIfAuthenticatedToHome;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ProductController;
+use App\Models\Product;
 
 Route::get('/', function () {
     return view('welcome');
@@ -72,4 +74,12 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
 
     return response()->json(['message' => 'Logged out successfully'], 200);
+});
+
+
+Route::get('/products/index', [ProductController::class, 'index'])->name('products.index');
+
+Route::get('/product/{slug}', function ($slug) {
+    $product = Product::where('slug', $slug)->firstOrFail();
+    return view('product', ['product' => $product]);
 });
