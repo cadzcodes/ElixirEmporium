@@ -12,9 +12,37 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
   const userDropdownRef = useRef(null)
-  const { user, loading } = useUserStatus()
+  const [user, setUser] = useState(() => {
+    return typeof window.__USER__ !== 'undefined' ? window.__USER__ : null
+  })
   const hideTimeout = useRef(null)
   const [csrfToken, setCsrfToken] = useState('');
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/user', {
+          credentials: 'include', // Needed to send session cookie
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data); // update state with logged-in user
+        } else {
+          setUser(null); // not logged in
+        }
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
 
   useEffect(() => {
@@ -31,7 +59,7 @@ const Navbar = () => {
       await fetch('/logout', {
         method: 'POST',
         body: formData,
-        credentials: 'same-origin',
+        credentials: 'include', // required for Laravel session
       });
 
       window.location.href = '/';
@@ -39,6 +67,8 @@ const Navbar = () => {
       console.error("Logout failed", err);
     }
   };
+
+
 
 
 
@@ -125,7 +155,7 @@ const Navbar = () => {
             </li>
           ))}
 
-          {!loading && (
+          {
             user ? (
               <>
                 <li>
@@ -181,7 +211,7 @@ const Navbar = () => {
                 </div>
               </li>
             )
-          )}
+          }
         </ul>
 
         {/* Hamburger Button */}
@@ -204,7 +234,7 @@ const Navbar = () => {
           </li>
         ))}
 
-        {!loading && (
+        {
           user ? (
             <>
               <li>
@@ -237,7 +267,7 @@ const Navbar = () => {
               </div>
             </li>
           )
-        )}
+        }
       </ul>
     </nav>
   )

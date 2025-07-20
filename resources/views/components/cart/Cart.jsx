@@ -3,72 +3,24 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ProductTable from './ProductTable';
 import OrderSummary from './OrderSummary';
+import axios from 'axios';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const fakeCartItems = [
-    {
-        id: 1,
-        name: 'Golden Elixir Whiskey',
-        subtitle: '750ml · Premium Blend',
-        price: 129.99,
-        quantity: 1,
-        image: '/images/mojito.png',
-    },
-    {
-        id: 2,
-        name: 'Royal Noir Vodka',
-        subtitle: '700ml · Ultra Smooth',
-        price: 99.49,
-        quantity: 2,
-        image: '/images/margarita.png',
-    },
-    {
-        id: 3,
-        name: 'Scarlet Cherry Brandy',
-        subtitle: '500ml · Sweet & Bold',
-        price: 89.99,
-        quantity: 2,
-        image: '/images/margarita.png',
-    },
-    {
-        id: 4,
-        name: 'Amber Gold Rum',
-        subtitle: '750ml · Barrel Aged',
-        price: 105.25,
-        quantity: 1,
-        image: '/images/margarita.png',
-    },
-    {
-        id: 5,
-        name: 'Midnight Sapphire Gin',
-        subtitle: '700ml · Botanical Fusion',
-        price: 94.75,
-        quantity: 1,
-        image: '/images/margarita.png',
-    },
-    {
-        id: 6,
-        name: 'Crimson Spice Tequila',
-        subtitle: '750ml · Extra Añejo',
-        price: 112.00,
-        quantity: 1,
-        image: '/images/margarita.png',
-    },
-    {
-        id: 7,
-        name: 'Royal Noir Vodka',
-        subtitle: '700ml · Ultra Smooth',
-        price: 99.49,
-        quantity: 2,
-        image: '/images/margarita.png',
-    },
-];
-
 const Cart = () => {
-    const [cartItems, setCartItems] = useState(
-        fakeCartItems.map(item => ({ ...item, selected: false }))
-    );
+
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        axios.get('/cart/items')
+            .then(res => {
+                const items = res.data.map(item => ({ ...item, selected: false, price: parseFloat(item.price ?? 0) }));
+                setCartItems(items);
+            })
+            .finally(() => setLoading(false));
+    }, []);
     const summaryRef = useRef(null);
 
     const handleSelect = id => {
@@ -95,17 +47,24 @@ const Cart = () => {
     };
 
     const handleDelete = id => {
-        setCartItems(prev => prev.filter(item => item.id !== id));
+        axios.delete(`/cart/items/${id}`)
+            .then(() => {
+                setCartItems(prev => prev.filter(i => i.id !== id));
+            });
     };
 
     const handleQuantityChange = (id, delta) => {
-        setCartItems(prev =>
-            prev.map(item =>
-                item.id === id
-                    ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-                    : item
-            )
-        );
+        const item = cartItems.find(i => i.id === id);
+        const newQty = Math.max(1, item.quantity + delta);
+
+        axios.put(`/cart/items/${id}`, { quantity: newQty })
+            .then(res => {
+                setCartItems(prev =>
+                    prev.map(i =>
+                        i.id === id ? { ...i, quantity: newQty } : i
+                    )
+                );
+            });
     };
 
     const selectedItems = cartItems.filter(item => item.selected);
@@ -133,26 +92,27 @@ const Cart = () => {
                     Your Cart
                 </h2>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+                {loading ? (
+                    <div className="text-center text-yellow text-xl">Loading your cart...</div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+                        <ProductTable
+                            cartItems={cartItems}
+                            onSelect={handleSelect}
+                            onSelectAll={handleSelectAll}
+                            onDelete={handleDelete}
+                            onQuantityChange={handleQuantityChange}
+                        />
+                        <OrderSummary
+                            ref={summaryRef}
+                            subtotal={subtotal}
+                            shipping={shipping}
+                            total={total}
+                            hasSelection={selectedItems.length > 0}
+                        />
+                    </div>
+                )}
 
-                    {/* Product Table */}
-                    <ProductTable
-                        cartItems={cartItems}
-                        onSelect={handleSelect}
-                        onSelectAll={handleSelectAll}
-                        onDelete={handleDelete}
-                        onQuantityChange={handleQuantityChange}
-                    />
-
-                    {/* Sticky Order Summary */}
-                    <OrderSummary
-                        ref={summaryRef}
-                        subtotal={subtotal}
-                        shipping={shipping}
-                        total={total}
-                        hasSelection={selectedItems.length > 0}
-                    />
-                </div>
             </div>
 
             {/* Mobile Checkout Bar */}

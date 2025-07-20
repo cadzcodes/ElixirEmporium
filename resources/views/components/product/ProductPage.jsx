@@ -1,12 +1,66 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import gsap from 'gsap';
 
 const ProductPage = () => {
   const product = window.__PRODUCT__;
+  const [adding, setAdding] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+
+  const qtyRef = useRef(null);
+
+  useEffect(() => {
+    if (qtyRef.current) {
+      gsap.fromTo(qtyRef.current, { scale: 0.9, opacity: 0.5 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.7)' });
+    }
+  }, [quantity]);
+
+  const handleAddToCart = async () => {
+    try {
+      setAdding(true);
+      setStatus(null);
+
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+      const res = await fetch('/cart/items', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': token,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity: quantity,
+        }),
+      });
+
+      if (res.ok) {
+        setStatus('Added to cart!');
+      } else {
+        const data = await res.json();
+        setStatus(data.message || 'Failed to add');
+      }
+    } catch (error) {
+      console.error('Add to cart failed:', error);
+      setStatus('Error adding to cart');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const increment = () => setQuantity((prev) => prev + 1);
+  const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  const handleManualChange = (e) => {
+    const val = parseInt(e.target.value);
+    if (!isNaN(val) && val > 0) setQuantity(val);
+  };
 
   return (
     <section className="relative min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center px-6 py-5 overflow-hidden" id="productPage">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-10 items-center z-10">
 
+        {/* Image */}
         <div className="relative flex items-center justify-center w-full max-w-md aspect-square mx-auto mt-12 md:mt-0">
           <div className="absolute w-48 h-48 md:w-64 md:h-64 bg-white/25 rounded-full blur-3xl animate-pulse-intense z-0" />
           <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl z-10">
@@ -18,13 +72,10 @@ const ProductPage = () => {
           </div>
         </div>
 
+        {/* Details */}
         <div className="space-y-6">
-          <h1 className="text-4xl md:text-5xl font-modern-negra text-yellow leading-tight">
-            {product.name}
-          </h1>
-          <p className="text-gray-300 text-lg leading-relaxed">
-            {product.description}
-          </p>
+          <h1 className="text-4xl md:text-5xl font-modern-negra text-yellow leading-tight">{product.name}</h1>
+          <p className="text-gray-300 text-lg leading-relaxed">{product.description}</p>
 
           <div className="flex items-center gap-4">
             <span className="text-3xl font-semibold text-white">${product.price}</span>
@@ -33,12 +84,43 @@ const ProductPage = () => {
             )}
           </div>
 
-          <a
-            href="/cart"
+          {/* Custom Quantity Input */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-white">Quantity:</span>
+            <div className="flex items-center border border-gray-400 rounded-full overflow-hidden bg-black/40">
+              <button
+                onClick={decrement}
+                className="w-8 h-8 text-lg flex items-center justify-center text-white hover:bg-yellow hover:text-black transition"
+              >
+                -
+              </button>
+              <input
+                ref={qtyRef}
+                type="text"
+                inputMode="numeric"
+                value={quantity}
+                onChange={handleManualChange}
+                className="w-12 text-center text-white bg-transparent outline-none"
+              />
+              <button
+                onClick={increment}
+                className="w-8 h-8 text-lg flex items-center justify-center text-white hover:bg-yellow hover:text-black transition"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Add to Cart */}
+          <button
+            onClick={handleAddToCart}
+            disabled={adding}
             className="cursor-pointer bg-yellow text-black px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-offset-2 text-center inline-block"
           >
-            Add to Cart
-          </a>
+            {adding ? 'Adding...' : 'Add to Cart'}
+          </button>
+
+          {status && <p className="text-sm text-green-400 pt-2">{status}</p>}
 
           <ul className="text-sm text-gray-400 pt-4 space-y-1">
             <li>✔️ Free shipping worldwide</li>

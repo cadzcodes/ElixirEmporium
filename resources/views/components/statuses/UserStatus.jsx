@@ -2,17 +2,16 @@
 import { useState, useEffect } from 'react';
 
 const useUserStatus = () => {
-    const [user, setUser] = useState(() => {
-        return window.__USER__ ?? null;
-    });
-    const [loading, setLoading] = useState(window.__USER__ === undefined);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (window.__USER__ !== undefined) return;
-
-        fetch('/user', {
+        fetch('user', {
+            method: 'GET',
             credentials: 'include',
-            headers: { 'Accept': 'application/json' }
+            headers: {
+                Accept: 'application/json',
+            },
         })
             .then(res => res.ok ? res.json() : null)
             .then(data => setUser(data))

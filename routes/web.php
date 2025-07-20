@@ -1,85 +1,57 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\RedirectIfAuthenticatedToHome;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Models\Product;
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/cocktails', function () {
-    return view('cocktails');
-});
-
-Route::get('/product', function () {
-    return view('product');
-});
-
-Route::get('/about', function () {
-    return view('about');
-});
-
-Route::get('/signup', function () {
-    return view('auth/signup');
-});
-
-Route::get('/art', function () {
-    return view('art');
-});
+use App\Http\Controllers\CartController;
 
 
-Route::get('/contact', function () {
-    return view('contact');
-});
+// Public pages
+Route::view('/', 'welcome');
+Route::view('/cocktails', 'cocktails');
+Route::view('/product', 'product');
+Route::view('/about', 'about');
+Route::view('/art', 'art');
+Route::view('/contact', 'contact');
+Route::view('/cart', 'cart');
+Route::view('/checkout', 'checkout');
+Route::view('/signup', 'auth.signup');
+Route::view('/login', 'auth.login');
 
-Route::get('/cart', function () {
-    return view('cart');
-});
-
-Route::get('/checkout', function () {
-    return view('checkout');
-});
-
-// Submit Forms Routes
-Route::post('/register', [AuthController::class, 'register']);
-
-
+// Auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
-Route::middleware([RedirectIfAuthenticatedToHome::class])->group(function () {
-    Route::get('/login', function () {
-        return view('auth/login'); // Replace as needed for React/Blade
-    });
-
-    Route::get('/register', function () {
-        return view('auth/register');
-    });
-});
-
-Route::get('/user', function () {
-    return response()->json(Auth::user());
-});
-
 Route::post('/logout', function (Request $request) {
     Auth::logout();
-
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
     return response()->json(['message' => 'Logged out successfully'], 200);
-});
+})->middleware('auth');
 
+// Get the currently logged-in user (for your React frontend to check session)
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth');
 
+// Product routes
 Route::get('/products/index', [ProductController::class, 'index'])->name('products.index');
 
+// Dynamic product page (e.g. /product/some-slug)
 Route::get('/product/{slug}', function ($slug) {
     $product = Product::where('slug', $slug)->firstOrFail();
     return view('product', ['product' => $product]);
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/cart/items', [CartController::class, 'index']);
+    Route::post('/cart/items', [CartController::class, 'store']);
+    Route::put('/cart/items/{id}', [CartController::class, 'update']);
+    Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
+    Route::delete('/cart/clear', [CartController::class, 'clear']);
 });

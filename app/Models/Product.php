@@ -24,4 +24,10 @@ class Product extends Model
             $product->slug = Str::slug($product->name);
         });
     }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
 }
