@@ -16,6 +16,12 @@ const ProductPage = () => {
   }, [quantity]);
 
   const handleAddToCart = async () => {
+    // Check if user is logged in (assumes window.__USER__ is null or object)
+    if (!window.__USER__) {
+      window.location.href = '/login';
+      return;
+    }
+
     try {
       setAdding(true);
       setStatus(null);
@@ -48,6 +54,7 @@ const ProductPage = () => {
       setAdding(false);
     }
   };
+
 
   const increment = () => setQuantity((prev) => prev + 1);
   const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));

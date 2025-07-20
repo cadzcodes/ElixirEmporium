@@ -27,6 +27,7 @@ body {
     background-color: black;
     color: white;
     scroll-behavior: smooth;
+     user-select: none;
 }
 
 @utility flex-center {
