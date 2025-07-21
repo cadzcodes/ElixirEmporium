@@ -28,7 +28,6 @@ const SignupForm = ({ formRef }) => {
         setStatus(null)
         setLoading(true)
 
-        // Animate button on click
         gsap.fromTo(buttonRef.current,
             { scale: 1 },
             { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1, ease: "power1.inOut" }
@@ -37,7 +36,7 @@ const SignupForm = ({ formRef }) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
 
         try {
-            const response = await fetch('/register', {
+            const registerRes = await fetch('/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,18 +45,38 @@ const SignupForm = ({ formRef }) => {
                 body: JSON.stringify(form)
             })
 
-            const data = await response.json()
+            const data = await registerRes.json()
 
-            if (!response.ok) {
+            if (!registerRes.ok) {
                 if (data.errors) {
                     setErrors(data.errors)
                 } else {
                     setAlert({ type: 'error', message: 'Something went wrong. Please try again.' })
                 }
             } else {
-                setAlert({ type: 'success', message: 'Registration successful!' })
-                setForm({ name: '', email: '', password: '' })
-                setTouched({})
+                // Auto-login
+                const loginRes = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        email: form.email,
+                        password: form.password
+                    })
+                })
+
+                if (loginRes.ok) {
+                    // Animate success then redirect
+                    setAlert({ type: 'success', message: 'Registration complete! Logging you in...' })
+
+                    setTimeout(() => {
+                        window.location.href = '/'
+                    }, 1500)
+                } else {
+                    setAlert({ type: 'error', message: 'Registered, but login failed.' })
+                }
             }
         } catch (error) {
             console.error('Signup error:', error)
@@ -66,6 +85,7 @@ const SignupForm = ({ formRef }) => {
             setLoading(false)
         }
     }
+
 
     const inputClass = (field) =>
         `w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none ${errors[field] && touched[field]

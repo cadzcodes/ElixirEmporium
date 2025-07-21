@@ -14,7 +14,7 @@ const Section = React.forwardRef(({ image, title, description, reverse = false }
         />
       </div>
       <div className="w-full md:w-1/2 space-y-6">
-        <h3 className="text-3xl md:text-4xl font-semibold text-yellow font-modern-negra">{title}</h3>
+        <h3 className="text-3xl md:text-4xl text-yellow font-modern-negra">{title}</h3>
         <p className="text-gray-300 text-lg leading-relaxed">{description}</p>
       </div>
     </div>
