@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import gsap from 'gsap'
 import AlertDialog from "../reusables/AlertDialog"
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 const SignupForm = ({ formRef }) => {
     const [form, setForm] = useState({ name: '', email: '', password: '' })
@@ -9,6 +10,7 @@ const SignupForm = ({ formRef }) => {
     const [status, setStatus] = useState(null)
     const [loading, setLoading] = useState(false)
     const [alert, setAlert] = useState(null)
+    const [toggle, setToggle] = useState(false)
 
     const buttonRef = useRef(null)
 
@@ -54,7 +56,6 @@ const SignupForm = ({ formRef }) => {
                     setAlert({ type: 'error', message: 'Something went wrong. Please try again.' })
                 }
             } else {
-                // Auto-login
                 const loginRes = await fetch('/login', {
                     method: 'POST',
                     headers: {
@@ -68,7 +69,6 @@ const SignupForm = ({ formRef }) => {
                 })
 
                 if (loginRes.ok) {
-                    // Animate success then redirect
                     setAlert({ type: 'success', message: 'Registration complete! Logging you in...' })
 
                     setTimeout(() => {
@@ -86,16 +86,14 @@ const SignupForm = ({ formRef }) => {
         }
     }
 
-
     const inputClass = (field) =>
         `w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none ${errors[field] && touched[field]
             ? 'ring-2 ring-red-500'
             : 'focus:ring-2 focus:ring-yellow'
-        }`
+        } ${field === 'password' ? 'pr-12' : ''}`
 
     return (
         <div className="md:col-span-2 flex items-center justify-center px-6 py-16 relative z-10">
-
             {alert && (
                 <AlertDialog
                     type={alert.type}
@@ -103,8 +101,6 @@ const SignupForm = ({ formRef }) => {
                     onClose={() => setAlert(null)}
                 />
             )}
-
-
 
             <div
                 ref={formRef}
@@ -117,20 +113,41 @@ const SignupForm = ({ formRef }) => {
 
                 <form className="space-y-5" onSubmit={handleSignup}>
                     {['name', 'email', 'password'].map((field) => (
-                        <div key={field}>
+                        <div key={field} className="relative">
                             <label htmlFor={field} className="text-sm text-gray-300 mb-1 block capitalize">
                                 {field}
                             </label>
-                            <input
-                                type={field === 'password' ? 'password' : field}
-                                id={field}
-                                value={form[field]}
-                                onChange={handleInput}
-                                onBlur={handleBlur}
-                                placeholder={field === 'name' ? 'Full Name' : field === 'email' ? 'you@example.com' : '••••••••'}
-                                required
-                                className={inputClass(field)}
-                            />
+
+                            <div className="relative">
+                                <input
+                                    type={field === 'password' ? (toggle ? 'text' : 'password') : field}
+                                    id={field}
+                                    value={form[field]}
+                                    onChange={handleInput}
+                                    onBlur={handleBlur}
+                                    placeholder={
+                                        field === 'name'
+                                            ? 'Full Name'
+                                            : field === 'email'
+                                                ? 'you@example.com'
+                                                : '••••••••'
+                                    }
+                                    required
+                                    className={inputClass(field)}
+                                />
+
+                                {field === 'password' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setToggle(!toggle)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow hover:text-white transition duration-300"
+                                        aria-label={toggle ? 'Hide password' : 'Show password'}
+                                    >
+                                        {toggle ? <FaEyeSlash /> : <FaEye />}
+                                    </button>
+                                )}
+                            </div>
+
                             {errors[field] && touched[field] && (
                                 <p className="text-red-500 text-xs mt-1">{errors[field][0]}</p>
                             )}
@@ -164,8 +181,6 @@ const SignupForm = ({ formRef }) => {
                 </div>
             </div>
         </div>
-
-
     )
 }
 

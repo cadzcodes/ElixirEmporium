@@ -1,16 +1,20 @@
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import gsap from 'gsap'
-import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
+import { FaCheckCircle, FaExclamationCircle, FaEye, FaEyeSlash } from 'react-icons/fa'
 import AlertDialog from "../reusables/AlertDialog"
 
 const LoginPage = () => {
   const formRef = useRef(null)
   const toastRef = useRef(null)
+  const buttonRef = useRef(null)
+
   const [toggle, setToggle] = useState(true)
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState(null)
   const [alert, setAlert] = useState(null)
-  const buttonRef = useRef(null)
+
+  const [passwordValue, setPasswordValue] = useState('')
+  const [passwordFocused, setPasswordFocused] = useState(false)
 
   // Initial animation
   useEffect(() => {
@@ -88,8 +92,6 @@ const LoginPage = () => {
     }
   }
 
-
-
   return (
     <div className="relative min-h-screen bg-[#0e0e0e] flex items-center justify-center px-6 py-12 overflow-hidden">
 
@@ -100,7 +102,6 @@ const LoginPage = () => {
           onClose={() => setAlert(null)}
         />
       )}
-
 
       {/* Background Blur */}
       <div className="absolute inset-0 bg-[url('/images/login-bg.jpg')] bg-cover bg-center opacity-10 blur-sm" />
@@ -156,14 +157,37 @@ const LoginPage = () => {
             <label htmlFor="password" className="block text-sm text-gray-300 mb-1">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-lg bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-yellow"
-              required
-            />
+            <div className="relative">
+              <input
+                type={toggle ? "password" : "text"}
+                id="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                value={passwordValue}
+                onChange={(e) => setPasswordValue(e.target.value)}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
+                className="w-full px-4 py-3 pr-12 rounded-lg bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-yellow"
+                required
+              />
+              {(passwordFocused || passwordValue.length > 0) && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => setToggle(!toggle)}
+                    className="text-yellow hover:text-white transition duration-300"
+                    aria-label={toggle ? "Show password" : "Hide password"}
+                  >
+                    {toggle ? <FaEyeSlash className="text-xl" /> : <FaEye className="text-xl" />}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+
+
+
+
 
           <div className="flex items-center justify-between text-sm text-gray-400">
             <label className="flex items-center gap-2">
@@ -193,7 +217,6 @@ const LoginPage = () => {
               'Sign In'
             )}
           </button>
-
         </form>
 
         <div className="text-center text-sm text-gray-500 pt-4">
