@@ -16,6 +16,7 @@ Route::view('/product', 'product');
 Route::view('/about', 'about');
 Route::view('/art', 'art');
 Route::view('/contact', 'contact');
+Route::view('/account', 'account');
 Route::view('/cart', 'cart');
 Route::view('/checkout', 'checkout');
 Route::view('/signup', 'auth.signup');
@@ -55,5 +56,3 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
 });
-
-Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->middleware('auth');
