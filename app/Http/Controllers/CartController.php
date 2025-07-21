@@ -27,7 +27,6 @@ class CartController extends Controller
         );
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
@@ -74,4 +73,22 @@ class CartController extends Controller
         CartItem::where('user_id', Auth::id())->delete();
         return response()->json(['message' => 'Cart cleared']);
     }
+
+    public function updateQuantity(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $cart = session()->get('cart', []);
+
+        if (isset($cart[$request->product_id])) {
+            $cart[$request->product_id]['quantity'] = $request->quantity;
+            session()->put('cart', $cart);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
+
 }

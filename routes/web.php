@@ -55,3 +55,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
 });
+
+Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->middleware('auth');

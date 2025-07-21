@@ -5,27 +5,35 @@ import gsap from 'gsap'
 
 const AlertDialog = ({ type = 'success', message = '', onClose }) => {
     const dialogRef = useRef(null)
+    const closeTimeout = useRef(null)
 
     useEffect(() => {
-        // Animate In
-        gsap.fromTo(dialogRef.current,
+        // Animate in
+        gsap.fromTo(
+            dialogRef.current,
             { y: -50, opacity: 0, scale: 0.9 },
             { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out' }
         )
 
-        const timer = setTimeout(() => handleClose(), 4000)
-        return () => clearTimeout(timer)
+        // Start auto-dismiss
+        closeTimeout.current = setTimeout(() => handleClose(), 3000)
+
+        return () => clearTimeout(closeTimeout.current)
     }, [])
 
     const handleClose = () => {
-        // Animate Out
+        if (!dialogRef.current) return
+        clearTimeout(closeTimeout.current)
+
         gsap.to(dialogRef.current, {
             y: -30,
             opacity: 0,
             scale: 0.9,
             duration: 0.3,
             ease: 'power2.in',
-            onComplete: onClose
+            onComplete: () => {
+                if (onClose) onClose()
+            },
         })
     }
 
@@ -40,7 +48,6 @@ const AlertDialog = ({ type = 'success', message = '', onClose }) => {
         }
     }
 
-    // Portal content
     const alertContent = (
         <div
             ref={dialogRef}

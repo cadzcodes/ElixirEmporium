@@ -161,7 +161,7 @@ const Navbar = () => {
                 <li>
                   <a href="/cart" className="relative">
                     <ShoppingCart size={24} />
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-3 h-3 flex items-center justify-center rounded-full"></span>
                   </a>
                 </li>
                 <li className="relative hidden lg:block">

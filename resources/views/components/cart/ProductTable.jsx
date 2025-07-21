@@ -31,7 +31,7 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
                 >
                     <div className="grid md:grid-cols-12 gap-4">
                         {/* Product */}
-                        <div className="md:col-span-5 flex gap-4 items-start">
+                        <div className="md:col-span-5 flex gap-4 items-center">
                             <input
                                 type="checkbox"
                                 checked={item.selected}
@@ -47,7 +47,7 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
                             />
                             <div className="flex-1">
                                 <h3 className="text-lg md:text-xl font-bold text-yellow">{item.name}</h3>
-                                <p className="text-sm italic text-gray-500">{item.subtitle}</p>
+                                <p className="text-sm italic text-gray-500">750ml • Classic</p>
                             </div>
                         </div>
 

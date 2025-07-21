@@ -1,33 +1,33 @@
-import React, { useState, useRef, useEffect } from 'react';
-import gsap from 'gsap';
+import React, { useState, useRef, useEffect } from 'react'
+import gsap from 'gsap'
+import AlertDialog from '../reusables/AlertDialog'
 
 const ProductPage = () => {
-  const product = window.__PRODUCT__;
-  const [adding, setAdding] = useState(false);
-  const [status, setStatus] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-
-  const qtyRef = useRef(null);
+  const product = window.__PRODUCT__
+  const [adding, setAdding] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  const [alerts, setAlerts] = useState([])
+  const qtyRef = useRef(null)
 
   useEffect(() => {
     if (qtyRef.current) {
-      gsap.fromTo(qtyRef.current, { scale: 0.9, opacity: 0.5 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.7)' });
+      gsap.fromTo(
+        qtyRef.current,
+        { scale: 0.9, opacity: 0.5 },
+        { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.7)' }
+      )
     }
-  }, [quantity]);
+  }, [quantity])
 
   const handleAddToCart = async () => {
-    // Check if user is logged in (assumes window.__USER__ is null or object)
     if (!window.__USER__) {
-      window.location.href = '/login';
-      return;
+      window.location.href = '/login'
+      return
     }
 
     try {
-      setAdding(true);
-      setStatus(null);
-
-      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
+      setAdding(true)
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
       const res = await fetch('/cart/items', {
         method: 'POST',
         headers: {
@@ -37,36 +37,37 @@ const ProductPage = () => {
         credentials: 'same-origin',
         body: JSON.stringify({
           product_id: product.id,
-          quantity: quantity,
+          quantity,
         }),
-      });
+      })
+
+      const id = Date.now()
 
       if (res.ok) {
-        setStatus('Added to cart!');
+        setAlerts(prev => [...prev, { id, type: 'success', message: 'Added to cart!' }])
       } else {
-        const data = await res.json();
-        setStatus(data.message || 'Failed to add');
+        const data = await res.json()
+        setAlerts(prev => [...prev, { id, type: 'error', message: data.message || 'Failed to add' }])
       }
     } catch (error) {
-      console.error('Add to cart failed:', error);
-      setStatus('Error adding to cart');
+      console.error('Add to cart failed:', error)
+      const id = Date.now()
+      setAlerts(prev => [...prev, { id, type: 'error', message: 'Error adding to cart' }])
     } finally {
-      setAdding(false);
+      setAdding(false)
     }
-  };
+  }
 
-
-  const increment = () => setQuantity((prev) => prev + 1);
-  const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  const increment = () => setQuantity(prev => prev + 1)
+  const decrement = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1))
   const handleManualChange = (e) => {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val) && val > 0) setQuantity(val);
-  };
+    const val = parseInt(e.target.value)
+    if (!isNaN(val) && val > 0) setQuantity(val)
+  }
 
   return (
     <section className="relative min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center px-6 py-5 overflow-hidden" id="productPage">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-10 items-center z-10">
-
         {/* Image */}
         <div className="relative flex items-center justify-center w-full max-w-md aspect-square mx-auto mt-12 md:mt-0">
           <div className="absolute w-48 h-48 md:w-64 md:h-64 bg-white/25 rounded-full blur-3xl animate-pulse-intense z-0" />
@@ -91,7 +92,7 @@ const ProductPage = () => {
             )}
           </div>
 
-          {/* Custom Quantity Input */}
+          {/* Quantity */}
           <div className="flex items-center gap-3">
             <span className="text-sm text-white">Quantity:</span>
             <div className="flex items-center border border-gray-400 rounded-full overflow-hidden bg-black/40">
@@ -118,16 +119,13 @@ const ProductPage = () => {
             </div>
           </div>
 
-          {/* Add to Cart */}
           <button
             onClick={handleAddToCart}
             disabled={adding}
-            className="cursor-pointer bg-yellow text-black px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-offset-2 text-center inline-block"
+            className="cursor-pointer bg-yellow text-black px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-offset-2"
           >
             {adding ? 'Adding...' : 'Add to Cart'}
           </button>
-
-          {status && <p className="text-sm text-green-400 pt-2">{status}</p>}
 
           <ul className="text-sm text-gray-400 pt-4 space-y-1">
             <li>✔️ Free shipping worldwide</li>
@@ -136,8 +134,22 @@ const ProductPage = () => {
           </ul>
         </div>
       </div>
-    </section>
-  );
-};
 
-export default ProductPage;
+      {/* Alerts */}
+      <div className="fixed top-4 right-4 space-y-3 z-[1000]">
+        {alerts.map(alert => (
+          <AlertDialog
+            key={alert.id}
+            type={alert.type}
+            message={alert.message}
+            onClose={() => {
+              setAlerts(prev => prev.filter(a => a.id !== alert.id))
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export default ProductPage
