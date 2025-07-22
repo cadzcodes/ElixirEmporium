@@ -21,7 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'gender',
+        'date_of_birth',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -51,6 +55,6 @@ class User extends Authenticatable
         return $this->hasMany(CartItem::class);
     }
 
-    
+
 
 }

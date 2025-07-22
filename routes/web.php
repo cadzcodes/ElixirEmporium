@@ -7,6 +7,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Models\Product;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\RedirectIfAuthenticatedToHome;
+use App\Http\Middleware\RedirectIfGuestToHome;
+
 
 
 // Public pages
@@ -16,15 +20,18 @@ Route::view('/product', 'product');
 Route::view('/about', 'about');
 Route::view('/art', 'art');
 Route::view('/contact', 'contact');
-Route::view('/account', 'account');
+Route::view('/account', 'account')->middleware(RedirectIfGuestToHome::class);
 Route::view('/cart', 'cart');
 Route::view('/checkout', 'checkout');
-Route::view('/signup', 'auth.signup');
-Route::view('/login', 'auth.login');
+Route::view('/signup', 'auth.signup')->middleware(RedirectIfAuthenticatedToHome::class);
+Route::view('/login', 'auth.login')->middleware(RedirectIfAuthenticatedToHome::class);
 
 // Auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/update-profile', [ProfileController::class, 'update'])->middleware('auth');
+
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
