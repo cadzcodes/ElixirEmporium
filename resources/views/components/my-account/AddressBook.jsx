@@ -204,7 +204,7 @@ const AddressBook = () => {
                                         <Briefcase size={16} className="text-yellow" /> Work
                                     </span>
                                 )}
-                                {!['Home', 'Work'].includes(addr.type) && '—'}
+                                {!['home', 'work'].includes(addr.type) && '—'}
 
                             </span>
                         </div>
