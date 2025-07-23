@@ -18,7 +18,7 @@ const provinces = [
 
 const addressTypes = ['home', 'work'];
 
-const AddressForm = ({ onSave, onCancel }) => {
+const AddressForm = ({ onSave, onCancel, onDelete, initialData = {}, isEditing = false }) => {
     const [form, setForm] = useState({
         fullName: '',
         phone: '',
@@ -31,6 +31,24 @@ const AddressForm = ({ onSave, onCancel }) => {
         isDefault: false,
     });
 
+
+    useEffect(() => {
+        if (isEditing && initialData) {
+            const parts = initialData.address2?.split(',').map(p => p.trim()) || [];
+
+            setForm({
+                fullName: initialData.name || '',
+                phone: initialData.phone || '',
+                address: initialData.address1 || '',
+                unitNumber: parts[0] || '',
+                barangay: parts[1] || '',
+                city: parts[2] || '',
+                province: parts[3] || '',
+                type: initialData.type || '',
+                isDefault: initialData.default || false,
+            });
+        }
+    }, [initialData, isEditing]);
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [saving, setSaving] = useState(false);
@@ -219,18 +237,26 @@ const AddressForm = ({ onSave, onCancel }) => {
                 </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-                <input
-                    type="checkbox"
-                    checked={form.isDefault}
-                    onChange={(e) => handleChange('isDefault', e.target.checked)}
-                    className="w-5 h-5 accent-yellow"
-                />
-                <label className="text-sm text-gray-300">Set as default address</label>
-            </div>
+            {!isEditing && (
+                <div className="flex items-center gap-2 pt-2">
+                    <input
+                        type="checkbox"
+                        id="default"
+                        className="w-5 h-5"
+                        checked={form.isDefault}
+                        onChange={e => setForm({ ...form, isDefault: e.target.checked })}
+                    />
+                    <label htmlFor="default" className="text-white">
+                        Set as default address
+                    </label>
+                </div>
+            )}
 
-            <div className="flex justify-end gap-4 pt-4">
-                {onCancel && (
+
+
+            <div className="flex justify-end items-center pt-4">
+
+                <div className="flex gap-3">
                     <button
                         type="button"
                         className="px-4 py-2 bg-[#333] border border-gray-600 text-white rounded-lg hover:bg-[#444]"
@@ -238,24 +264,25 @@ const AddressForm = ({ onSave, onCancel }) => {
                     >
                         Cancel
                     </button>
-                )}
-                <button
-                    type="button"
-                    className="px-4 py-2 bg-yellow text-black font-semibold rounded-lg hover:bg-yellow/90 disabled:opacity-60"
-                    onClick={async () => {
-                        if (!isValid()) return;
-                        setSaving(true);
-                        try {
-                            await onSave(form);
-                        } finally {
-                            setSaving(false);
-                        }
-                    }}
-                    disabled={saving}
-                >
-                    {saving ? 'Saving...' : 'Save Address'}
-                </button>
+                    <button
+                        type="button"
+                        className="px-4 py-2 bg-yellow text-black font-semibold rounded-lg hover:bg-yellow/90 disabled:opacity-60"
+                        onClick={async () => {
+                            if (!isValid()) return;
+                            setSaving(true);
+                            try {
+                                await onSave(form);
+                            } finally {
+                                setSaving(false);
+                            }
+                        }}
+                        disabled={saving}
+                    >
+                        {saving ? (isEditing ? 'Saving Changes...' : 'Saving...') : isEditing ? 'Save Changes' : 'Save Address'}
+                    </button>
+                </div>
             </div>
+
         </div>
     );
 };

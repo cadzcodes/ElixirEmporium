@@ -97,4 +97,20 @@ class AddressController extends Controller
 
         return response()->json(['message' => 'Address deleted successfully']);
     }
+
+    public function setDefault($id)
+    {
+        $user = Auth::user();
+
+        // Remove default from all user's addresses
+        Address::where('user_id', $user->id)->update(['is_default' => false]);
+
+        // Set selected one as default
+        $address = Address::where('user_id', $user->id)->findOrFail($id);
+        $address->is_default = true;
+        $address->save();
+
+        return response()->json(['message' => 'Default address updated', 'address' => $address]);
+    }
+
 }

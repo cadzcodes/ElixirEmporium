@@ -73,4 +73,5 @@ Route::middleware('auth')->group(function () {
     Route::put('/addresses/{id}', [AddressController::class, 'update']);
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     Route::put('/addresses/{id}/default', [AddressController::class, 'setDefault']);
+    Route::patch('/addresses/{id}/default', [AddressController::class, 'setDefault']);
 });

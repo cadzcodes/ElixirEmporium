@@ -5,6 +5,7 @@ import AddressBook from "./components/my-account/AddressBook";
 import MyOrders from "./components/my-account/MyOrders";
 import Navbar from "./components/Navbar";
 import { AlertTriangle } from 'lucide-react';
+import SmoothFollower from "./components/Cursor";
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState('profile');
@@ -48,8 +49,26 @@ const MyAccount = () => {
 
     return (
         <div>
+            <SmoothFollower />
             <Navbar />
-            <div className="min-h-screen bg-[#0e0e0e] text-white flex pt-24 px-6 md:px-16 pb-32">
+
+            <div className="min-h-screen bg-[#0e0e0e] text-white flex pt-35 lg:pt-24 px-6 md:px-16 pb-32">
+
+
+
+                {/* Mobile Tab Navigation */}
+                <div className="lg:hidden fixed top-17 inset-x-0 bg-[#111] border-b border-yellow/20 z-40 px-4 py-3 flex justify-around">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => handleTabClick(tab.id)}
+                            className={`text-sm font-semibold py-2 px-3 rounded-lg transition-colors 
+                ${activeTab === tab.id ? 'bg-yellow text-black' : 'text-white hover:bg-yellow/20'}`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
                 {/* Sidebar */}
                 <aside className="w-64 sticky top-32 space-y-4 border-r border-yellow/30 pr-6 hidden lg:block">
