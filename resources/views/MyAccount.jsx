@@ -1,17 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import ProfileTab from "./components/my-account/ProfileTab";
 import AddressBook from "./components/my-account/AddressBook";
 import MyOrders from "./components/my-account/MyOrders";
 import Navbar from "./components/Navbar";
 import { AlertTriangle } from 'lucide-react';
-import AlertDialog from './components/reusables/AlertDialog';
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState('profile');
     const [unsavedChanges, setUnsavedChanges] = useState(false);
     const [pendingTab, setPendingTab] = useState(null);
     const [showPrompt, setShowPrompt] = useState(false);
+    const [userData, setUserData] = useState(window.__USER__);
     const profileRef = useRef();
 
     const tabs = [
@@ -30,8 +30,9 @@ const MyAccount = () => {
     };
 
     const handleSaveAndSwitch = async () => {
-        const success = await profileRef.current?.handleSave();
-        if (success) {
+        const updatedUser = await profileRef.current?.handleSave();
+        if (updatedUser) {
+            setUserData(updatedUser); // ← this now reflects in ProfileTab
             setShowPrompt(false);
             setUnsavedChanges(false);
             setActiveTab(pendingTab);
@@ -39,7 +40,7 @@ const MyAccount = () => {
     };
 
     const handleDiscard = () => {
-        profileRef.current?.resetForm(); // reset form to saved version
+        profileRef.current?.resetForm(); // reset form to last saved version
         setShowPrompt(false);
         setUnsavedChanges(false);
         setActiveTab(pendingTab);
@@ -64,13 +65,16 @@ const MyAccount = () => {
                     ))}
                 </aside>
 
-                {/* Right Side - Floating Box */}
+                {/* Right Side */}
                 <main className="flex-1 lg:pl-12">
                     <div className="w-full bg-[#111111] rounded-2xl border border-yellow/20 shadow-2xl p-6 md:p-10 space-y-6 transition-all duration-500">
                         {activeTab === 'profile' && (
                             <ProfileTab
                                 ref={profileRef}
                                 setUnsaved={setUnsavedChanges}
+                                active={true}
+                                userData={userData}
+                                onUserUpdate={setUserData} // ✅ pass this!
                             />
                         )}
                         {activeTab === 'addresses' && <AddressBook />}
@@ -79,6 +83,7 @@ const MyAccount = () => {
                 </main>
             </div>
 
+            {/* Prompt */}
             {showPrompt && (
                 <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
                     <div className="bg-[#1a1a1a] border border-yellow/30 p-6 rounded-2xl w-[90%] max-w-md shadow-2xl text-white">
@@ -102,9 +107,9 @@ const MyAccount = () => {
                             </button>
                             <button
                                 onClick={handleSaveAndSwitch}
-                                className="px-4 py-2 rounded-lg bg-yellow hover:bg-yellow/90 text-black font-semibold"
+                                className="px-4 py-2 rounded-lg bg-yellow text-black font-semibold"
                             >
-                                Save
+                                Save & Switch
                             </button>
                         </div>
                     </div>
@@ -115,7 +120,6 @@ const MyAccount = () => {
 };
 
 const rootElement = document.getElementById('myAccount');
-
 if (rootElement) {
     ReactDOM.createRoot(rootElement).render(<MyAccount />);
 } else {

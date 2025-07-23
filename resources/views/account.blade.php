@@ -13,6 +13,7 @@
 </body>
 <script>
     window.__USER__ = @json(Auth::user());
+    window.__ADDRESSES__ = @json($user->addresses);
 </script>
 
 </html>

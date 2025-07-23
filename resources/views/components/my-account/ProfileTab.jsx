@@ -12,16 +12,15 @@ const genderIcons = {
 const genderOptions = ['male', 'female'];
 
 const ProfileTab = forwardRef((props, ref) => {
-    const initialUser = window.__USER__;
+    const [user, setUser] = useState(props.userData);
     const unsavedRef = useRef(null);
 
-    const [user, setUser] = useState({
-        name: initialUser.name || '',
-        email: initialUser.email || '',
-        phone: initialUser.phone || '',
-        gender: initialUser.gender || '',
-        date_of_birth: initialUser.date_of_birth || '',
-    });
+    useEffect(() => {
+        setUser(props.userData);
+        setForm(props.userData);  // Sync form too
+        setUnsavedChanges(false);
+        props.setUnsaved(false);
+    }, [props.userData]);
 
     const [form, setForm] = useState({ ...user });
     const [unsavedChanges, setUnsavedChanges] = useState(false);
@@ -103,19 +102,36 @@ const ProfileTab = forwardRef((props, ref) => {
             });
 
             setUser({ ...form });
+
+            // ✅ Notify parent of updated user
+            if (props.onUserUpdate) {
+                props.onUserUpdate({ ...form });
+            }
+
             setUnsavedChanges(false);
-            props.setUnsaved(false); // ← keep parent in sync
-            setDialogContent({ title: 'Success!', message: 'Profile updated successfully.', success: true });
+            props.setUnsaved(false);
+
+            setDialogContent({
+                title: 'Success!',
+                message: 'Profile updated successfully.',
+                success: true
+            });
             setShowDialog(true);
 
-            return true; // ← return success
+            return { ...form };
         } catch (err) {
             console.error(err);
-            setDialogContent({ title: 'Update Failed', message: 'Please try again later.', success: false });
+            setDialogContent({
+                title: 'Update Failed',
+                message: 'Please try again later.',
+                success: false
+            });
             setShowDialog(true);
-            return false; // ← return failure
+            return false;
         }
     };
+
+
 
     const censoredPhone = user.phone ? user.phone.replace(/.(?=.{3})/g, '*') : 'Not provided';
     const censoredEmail = user.email.replace(/(.{3})(.*)(@.*)/, "$1***$3");

@@ -10,7 +10,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RedirectIfAuthenticatedToHome;
 use App\Http\Middleware\RedirectIfGuestToHome;
-
+use App\Http\Controllers\AddressController;
 
 
 // Public pages
@@ -20,7 +20,10 @@ Route::view('/product', 'product');
 Route::view('/about', 'about');
 Route::view('/art', 'art');
 Route::view('/contact', 'contact');
-Route::view('/account', 'account')->middleware(RedirectIfGuestToHome::class);
+Route::get('/account', function () {
+    $user = auth()->user()->load('addresses'); // ✅ eager load addresses
+    return view('account', compact('user'));
+})->middleware(RedirectIfGuestToHome::class);
 Route::view('/cart', 'cart');
 Route::view('/checkout', 'checkout');
 Route::view('/signup', 'auth.signup')->middleware(RedirectIfAuthenticatedToHome::class);
@@ -62,4 +65,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/cart/items/{id}', [CartController::class, 'update']);
     Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/addresses', [AddressController::class, 'index']);
+    Route::post('/addresses', [AddressController::class, 'store']);
+    Route::put('/addresses/{id}', [AddressController::class, 'update']);
+    Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+    Route::put('/addresses/{id}/default', [AddressController::class, 'setDefault']);
 });
