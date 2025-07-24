@@ -13,15 +13,15 @@ const OrderSummary = forwardRef(({ subtotal, shipping, total, hasSelection }, re
             <div className="space-y-4 text-gray-300">
                 <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>₱{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>${shipping.toFixed(2)}</span>
+                    <span>₱{shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-white text-lg border-t border-yellow/20 pt-4">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>₱{total.toFixed(2)}</span>
                 </div>
             </div>
 

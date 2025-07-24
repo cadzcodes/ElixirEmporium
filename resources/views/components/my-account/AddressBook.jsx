@@ -383,7 +383,12 @@ const AddressBook = () => {
                                         isEditing={!!editingAddress}
                                         onSave={async (formData) => {
                                             if (editingAddress) {
-                                                await handleUpdate(editingAddress.id, formData);
+                                                // Force isDefault to true if editing address is default
+                                                const patchedFormData = {
+                                                    ...formData,
+                                                    isDefault: editingAddress.default || formData.isDefault,
+                                                };
+                                                await handleUpdate(editingAddress.id, patchedFormData);
                                             } else {
                                                 await handleSave(formData);
                                             }

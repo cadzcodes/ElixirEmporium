@@ -30,14 +30,14 @@ const OrderDetails = ({ items }) => {
                         </div>
 
                         {/* Unit Price */}
-                        <p className="text-sm text-gray-400 text-right">${item.price.toFixed(2)}</p>
+                        <p className="text-sm text-gray-400 text-right">₱{item.price.toFixed(2)}</p>
 
                         {/* Quantity */}
                         <p className="text-sm text-gray-400 text-center">{item.quantity}</p>
 
                         {/* Subtotal */}
                         <p className="text-lg font-semibold text-yellow text-right">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ₱{(item.price * item.quantity).toFixed(2)}
                         </p>
                     </div>
                 ))}

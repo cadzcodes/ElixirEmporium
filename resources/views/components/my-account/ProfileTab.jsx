@@ -3,6 +3,7 @@ import axios from 'axios';
 import { CheckCircle2, User, UserRound, AlertTriangle } from 'lucide-react';
 import gsap from 'gsap';
 import AlertDialog from '../reusables/AlertDialog';
+import dayjs from 'dayjs';
 
 const genderIcons = {
     male: <User className="text-yellow w-7 h-7" />,
@@ -54,6 +55,62 @@ const ProfileTab = forwardRef((props, ref) => {
         }
     }, [unsavedChanges]);
 
+    const [errors, setErrors] = useState({});
+    const validateField = (field, value) => {
+        const newErrors = { ...errors };
+
+        switch (field) {
+            case 'name':
+                if (!value || value.trim().length < 3) {
+                    newErrors.name = 'Name must be at least 3 characters';
+                } else {
+                    delete newErrors.name;
+                }
+                break;
+
+            case 'email':
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    newErrors.email = 'Enter a valid email address';
+                } else {
+                    delete newErrors.email;
+                }
+                break;
+
+            case 'phone':
+                if (!/^\d{11}$/.test(value)) {
+                    newErrors.phone = 'Phone must be exactly 11 digits';
+                } else {
+                    delete newErrors.phone;
+                }
+                break;
+
+            case 'date_of_birth':
+                const dob = dayjs(value);
+                const now = dayjs();
+                const age = now.diff(dob, 'year');
+
+                if (!dob.isValid()) {
+                    newErrors.date_of_birth = 'Invalid date';
+                } else if (dob.isAfter(now)) {
+                    newErrors.date_of_birth = 'DOB cannot be in the future';
+                } else if (age < 18) {
+                    newErrors.date_of_birth = 'You must be at least 18 years old';
+                } else {
+                    delete newErrors.date_of_birth;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        setErrors(newErrors);
+    };
+
+    const handleBlur = (field, value) => {
+        validateField(field, value);
+    };
+
 
     // Detect tab change or close
     useEffect(() => {
@@ -81,9 +138,7 @@ const ProfileTab = forwardRef((props, ref) => {
     const handleChange = (field, value) => {
         setForm((prev) => {
             const updated = { ...prev, [field]: value };
-
-            const hasChanges =
-                Object.keys(user).some((key) => updated[key] !== user[key]);
+            const hasChanges = Object.keys(user).some((key) => updated[key] !== user[key]);
 
             setUnsavedChanges(hasChanges);
             props.setUnsaved(hasChanges);
@@ -94,6 +149,21 @@ const ProfileTab = forwardRef((props, ref) => {
 
 
     const handleSave = async () => {
+        // Validate all before save
+        ['name', 'email', 'phone', 'date_of_birth'].forEach((field) =>
+            validateField(field, form[field])
+        );
+
+        if (Object.keys(errors).length > 0) {
+            setDialogContent({
+                title: 'Validation Error',
+                message: 'Please fix the form errors before saving.',
+                success: false,
+            });
+            setShowDialog(true);
+            return false;
+        }
+
         try {
             const res = await axios.post('/update-profile', form, {
                 headers: {
@@ -102,11 +172,7 @@ const ProfileTab = forwardRef((props, ref) => {
             });
 
             setUser({ ...form });
-
-            // ✅ Notify parent of updated user
-            if (props.onUserUpdate) {
-                props.onUserUpdate({ ...form });
-            }
+            if (props.onUserUpdate) props.onUserUpdate({ ...form });
 
             setUnsavedChanges(false);
             props.setUnsaved(false);
@@ -114,7 +180,7 @@ const ProfileTab = forwardRef((props, ref) => {
             setDialogContent({
                 title: 'Success!',
                 message: 'Profile updated successfully.',
-                success: true
+                success: true,
             });
             setShowDialog(true);
 
@@ -124,7 +190,7 @@ const ProfileTab = forwardRef((props, ref) => {
             setDialogContent({
                 title: 'Update Failed',
                 message: 'Please try again later.',
-                success: false
+                success: false,
             });
             setShowDialog(true);
             return false;
@@ -160,39 +226,52 @@ const ProfileTab = forwardRef((props, ref) => {
                     <label className="block text-sm text-gray-400 mb-1">Name</label>
                     <input
                         type="text"
-                        className="bg-[#1a1a1a] px-4 py-3 w-full rounded-lg border border-yellow/20 text-white"
+                        className={`bg-[#1a1a1a] px-4 py-3 w-full rounded-lg border text-white ${errors.name ? 'border-red-500' : 'border-yellow/20'
+                            }`}
                         value={form.name}
                         onChange={(e) => handleChange('name', e.target.value)}
+                        onBlur={(e) => handleBlur('name', e.target.value)}
                     />
+                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
+
 
                 {/* Email */}
                 <div>
                     <label className="block text-sm text-gray-400 mb-1">Email Address</label>
                     <input
                         type="email"
-                        className="bg-[#1a1a1a] px-4 py-3 w-full rounded-lg border border-yellow/20 text-white"
+                        className={`bg-[#1a1a1a] px-4 py-3 w-full rounded-lg border text-white ${errors.email ? 'border-red-500' : 'border-yellow/20'
+                            }`}
                         value={isEmailFocused || form.email !== user.email ? form.email : censoredEmail}
                         onFocus={() => setIsEmailFocused(true)}
-                        onBlur={() => {
+                        onBlur={(e) => {
                             setIsEmailFocused(false);
-                            if (form.email === user.email) {
-                                setForm((prev) => ({ ...prev, email: user.email }));
-                            }
+                            handleBlur('email', e.target.value);
                         }}
                         onChange={(e) => handleChange('email', e.target.value)}
                     />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
+
 
                 {/* Phone */}
                 <div>
                     <label className="block text-sm text-gray-400 mb-1">Phone Number</label>
                     <input
                         type="text"
-                        className="bg-[#1a1a1a] px-4 py-3 w-full rounded-lg border border-yellow/20 text-white"
+                        inputMode="numeric"
+                        pattern="\d*"
+                        className={`bg-[#1a1a1a] px-4 py-3 w-full rounded-lg border text-white ${errors.phone ? 'border-red-500' : 'border-yellow/20'
+                            }`}
                         value={form.phone}
-                        onChange={(e) => handleChange('phone', e.target.value)}
+                        onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            handleChange('phone', val);
+                        }}
+                        onBlur={(e) => handleBlur('phone', e.target.value)}
                     />
+                    {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                 </div>
 
                 {/* Gender */}
@@ -230,11 +309,15 @@ const ProfileTab = forwardRef((props, ref) => {
                     <label className="block text-sm text-gray-400 mb-1">Date of Birth</label>
                     <input
                         type="date"
-                        className="bg-[#1a1a1a] px-3 py-2 w-1/2 md:w-1/3 rounded-lg border border-yellow/20 text-white cursor-pointer
-               [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-80"
+                        className={`bg-[#1a1a1a] px-3 py-2 w-1/2 md:w-1/3 rounded-lg border text-white cursor-pointer ${errors.date_of_birth ? 'border-red-500' : 'border-yellow/20'
+                            } [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-80`}
                         value={form.date_of_birth}
                         onChange={(e) => handleChange('date_of_birth', e.target.value)}
+                        onBlur={(e) => handleBlur('date_of_birth', e.target.value)}
                     />
+                    {errors.date_of_birth && (
+                        <p className="text-red-500 text-sm mt-1">{errors.date_of_birth}</p>
+                    )}
                 </div>
 
                 {/* Save Button */}

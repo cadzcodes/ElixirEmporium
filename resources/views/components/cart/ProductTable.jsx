@@ -53,7 +53,7 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
 
                         {/* Desktop Price */}
                         <div className="hidden md:flex md:col-span-2 justify-center items-center text-white text-lg">
-                            ${item.price.toFixed(2)}
+                            ₱{item.price.toFixed(2)}
                         </div>
 
                         {/* Desktop Quantity */}
@@ -81,7 +81,7 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
 
                         {/* Desktop Total */}
                         <div className="hidden md:flex md:col-span-2 justify-center items-center text-white font-bold text-lg">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ₱{(item.price * item.quantity).toFixed(2)}
                         </div>
 
                         {/* Desktop Remove */}
@@ -103,7 +103,7 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
                         {/* Price */}
                         <div className="w-full bg-[#2a2a2a] px-4 py-2 rounded-xl flex justify-between text-white text-sm">
                             <span className="text-gray-400">Unit Price</span>
-                            <span>${item.price.toFixed(2)}</span>
+                            <span>₱{item.price.toFixed(2)}</span>
                         </div>
 
                         {/* Quantity */}
@@ -135,7 +135,7 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
                         {/* Total */}
                         <div className="w-full bg-[#2a2a2a] px-4 py-2 rounded-xl flex justify-between text-white text-sm">
                             <span className="text-gray-400">Total</span>
-                            <span className="font-bold text-lg">${(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="font-bold text-lg">₱{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
 
                         {/* Remove Button */}

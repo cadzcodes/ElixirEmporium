@@ -72,7 +72,7 @@ const Cart = () => {
 
     const selectedItems = cartItems.filter(item => item.selected);
     const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shipping = selectedItems.length > 0 ? 15 : 0;
+    const shipping = selectedItems.length > 0 ? 100 : 0;
     const total = subtotal + shipping;
 
     // Animate Order Summary on scroll (not on selection)
@@ -155,7 +155,7 @@ const Cart = () => {
             <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-yellow/30 px-6 py-4 z-50">
                 <div className="flex items-center justify-between">
                     <div className="text-white text-lg font-semibold">
-                        Total: <span className="text-yellow">${total.toFixed(2)}</span>
+                        Total: <span className="text-yellow">₱{total.toFixed(2)}</span>
                     </div>
                     <button
                         disabled={selectedItems.length === 0}
