@@ -365,43 +365,50 @@ const AddressBook = () => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-2xl rounded-2xl bg-[#1a1a1a] p-8 text-white border border-yellow/20 shadow-2xl relative">
+                            <Dialog.Panel className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#1a1a1a] p-8 text-white border border-yellow/20 shadow-2xl relative">
                                 <button
                                     onClick={() => setShowDialog(false)}
                                     className="absolute top-4 right-4 text-gray-400 hover:text-white"
                                 >
                                     <X />
                                 </button>
+
                                 <Dialog.Title className="text-2xl font-bold text-yellow mb-4">
-                                    Add New Address
+                                    {editingAddress ? 'Edit Address' : 'Add New Address'}
                                 </Dialog.Title>
 
-                                <AddressForm
-                                    initialData={editingAddress}
-                                    isEditing={!!editingAddress}
-                                    onSave={async (formData) => {
-                                        if (editingAddress) {
-                                            await handleUpdate(editingAddress.id, formData);
-                                        } else {
-                                            await handleSave(formData);
+                                <div className="space-y-4">
+                                    <AddressForm
+                                        initialData={editingAddress}
+                                        isEditing={!!editingAddress}
+                                        onSave={async (formData) => {
+                                            if (editingAddress) {
+                                                await handleUpdate(editingAddress.id, formData);
+                                            } else {
+                                                await handleSave(formData);
+                                            }
+                                            setEditingAddress(null);
+                                            setShowDialog(false);
+                                        }}
+                                        onDelete={
+                                            editingAddress
+                                                ? async () => {
+                                                    await handleDelete(editingAddress.id);
+                                                    setEditingAddress(null);
+                                                    setShowDialog(false);
+                                                }
+                                                : null
                                         }
-                                        setEditingAddress(null);
-                                        setShowDialog(false);
-                                    }}
-                                    onDelete={editingAddress ? async () => {
-                                        await handleDelete(editingAddress.id);
-                                        setEditingAddress(null);
-                                        setShowDialog(false);
-                                    } : null}
-                                    onCancel={() => {
-                                        setEditingAddress(null);
-                                        setShowDialog(false);
-                                    }}
-                                />
-
+                                        onCancel={() => {
+                                            setEditingAddress(null);
+                                            setShowDialog(false);
+                                        }}
+                                    />
+                                </div>
                             </Dialog.Panel>
                         </Transition.Child>
                     </div>
+
                 </Dialog>
             </Transition>
 

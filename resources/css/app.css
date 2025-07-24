@@ -27,7 +27,34 @@ body {
     background-color: black;
     color: white;
     scroll-behavior: smooth;
-     user-select: none;
+    user-select: none;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    /* thinner than default */
+    height: 6px;
+    /* for horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    /* more subtle dark track */
+    border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-yellow);
+    /* use your soft gold */
+    border-radius: 12px;
+    border: 2px solid #1a1a1a;
+    /* matches your modal bg */
+    transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #fbe98a;
+    /* lighter hover tint (soft gold highlight) */
 }
 
 @utility flex-center {
