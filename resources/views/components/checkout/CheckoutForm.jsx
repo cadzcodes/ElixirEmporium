@@ -23,6 +23,13 @@ const CheckoutForm = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const stored = sessionStorage.getItem('checkoutItems');
+        if (!stored) {
+            window.location.href = '/cart'; // Redirect if no checkout items
+        }
+    }, []);
+
     // Fetch default shipping address
     useEffect(() => {
         const fetchDefaultAddress = async () => {
