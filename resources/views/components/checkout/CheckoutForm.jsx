@@ -8,16 +8,22 @@ const CheckoutForm = () => {
     const [shipping, setShipping] = useState(null);
     const [loadingAddress, setLoadingAddress] = useState(true);
     const [payment, setPayment] = useState('Credit Card');
+    const [items, setItems] = useState([]);
 
-    const items = [
-        { name: 'Golden Elixir Whiskey', quantity: 1, price: 129.99, image: '/images/mojito.png' },
-        { name: 'Royal Noir Vodka', quantity: 2, price: 99.49, image: '/images/margarita.png' },
-    ];
+    // Fetch cart items from sessionStorage
+    useEffect(() => {
+        const stored = sessionStorage.getItem('checkoutItems');
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                setItems(parsed);
+            } catch (err) {
+                console.error('Invalid checkoutItems format in sessionStorage:', err);
+            }
+        }
+    }, []);
 
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shippingFee = 15;
-    const total = subtotal + shippingFee;
-
+    // Fetch default shipping address
     useEffect(() => {
         const fetchDefaultAddress = async () => {
             try {
@@ -57,8 +63,12 @@ const CheckoutForm = () => {
         fetchDefaultAddress();
     }, []);
 
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const shippingFee = items.length > 0 ? 100 : 0;
+    const total = subtotal + shippingFee;
+
     const handlePlaceOrder = () => {
-        alert('Order placed!');
+        alert('Order placed! (Connect this to Laravel backend later)');
     };
 
     return (

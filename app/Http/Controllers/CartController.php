@@ -91,4 +91,28 @@ class CartController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    // CartController.php
+    public function checkoutDetails(Request $request)
+    {
+        $items = $request->input('items', []); // [{ id, quantity }]
+
+        $productData = [];
+
+        foreach ($items as $item) {
+            $product = Product::find($item['id']);
+            if ($product) {
+                $productData[] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => (float) $product->price,
+                    'image' => $product->image_url,
+                    'quantity' => $item['quantity'],
+                ];
+            }
+        }
+
+        return response()->json($productData);
+    }
+
+
 }

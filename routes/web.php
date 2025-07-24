@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/cart/items/{id}', [CartController::class, 'update']);
     Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
+    Route::post('/cart/checkout-details', [CartController::class, 'checkoutDetails']);
 });
 
 Route::middleware('auth')->group(function () {
@@ -75,3 +76,4 @@ Route::middleware('auth')->group(function () {
     Route::put('/addresses/{id}/default', [AddressController::class, 'setDefault']);
     Route::patch('/addresses/{id}/default', [AddressController::class, 'setDefault']);
 });
+

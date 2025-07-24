@@ -146,6 +146,7 @@ const Cart = () => {
                             shipping={shipping}
                             total={total}
                             hasSelection={selectedItems.length > 0}
+                            selectedItems={selectedItems}
                         />
                     </div>
                 )}

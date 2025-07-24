@@ -1,9 +1,13 @@
 import React from 'react';
+import { FaClipboardList } from 'react-icons/fa';
 
 const OrderDetails = ({ items }) => {
     return (
         <div className="bg-[#1a1a1a] p-8 rounded-2xl border border-yellow/20 shadow-2xl">
-            <h3 className="text-3xl font-bold text-yellow mb-8 tracking-wide">Order Details</h3>
+            <h3 className="text-2xl font-semibold text-yellow mb-6 flex items-center gap-2">
+                <FaClipboardList className="text-yellow" size={20} />
+                Order Details:
+            </h3>
 
             {/* Headings */}
             <div className="grid grid-cols-[1fr_160px_60px_160px] text-sm text-gray-500 uppercase px-2 pb-3 border-b border-yellow/10">

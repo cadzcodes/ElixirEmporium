@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaCreditCard } from 'react-icons/fa';
 
 import { CheckCircle2, CreditCard, DollarSign, Wallet, Smartphone } from 'lucide-react';
 
@@ -14,7 +15,8 @@ const paymentOptions = ['Credit Card', 'PayPal', 'GCash', 'Cash on Delivery'];
 const PaymentMethod = ({ payment, setPayment }) => {
     return (
         <div className="bg-[#1a1a1a] p-8 rounded-2xl border border-yellow/20 shadow-xl">
-            <h3 className="text-2xl font-bold text-yellow mb-6 uppercase tracking-wide">
+            <h3 className="text-2xl font-semibold text-yellow mb-6 flex items-center gap-2">
+                <FaCreditCard className="text-yellow" size={20} />
                 Payment Method
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

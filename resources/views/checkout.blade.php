@@ -14,6 +14,7 @@
 
 <script>
     window.__USER__ = @json(Auth::user());
+    window.checkoutItems = @json(session('checkoutItems'));
 </script>
 
 </html>
