@@ -1,6 +1,6 @@
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import gsap from 'gsap'
-import { FaCheckCircle, FaExclamationCircle, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaCheckCircle, FaExclamationCircle, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa'
 import AlertDialog from "../reusables/AlertDialog"
 
 const LoginPage = () => {
@@ -12,9 +12,11 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState(null)
   const [alert, setAlert] = useState(null)
+  const [loginSuccess, setLoginSuccess] = useState(false)
 
   const [passwordValue, setPasswordValue] = useState('')
   const [passwordFocused, setPasswordFocused] = useState(false)
+  const successTextRef = useRef(null)
 
   // Initial animation
   useEffect(() => {
@@ -83,7 +85,17 @@ const LoginPage = () => {
         setAlert({ type: 'error', message: 'Invalid login credentials.' })
       } else {
         setAlert({ type: 'success', message: 'Login successful!' })
-        setTimeout(() => window.location.href = '/', 2000)
+        setLoginSuccess(true)
+
+        // Animate the text only
+        gsap.fromTo(successTextRef.current,
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
+        )
+
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 1800)
       }
     } catch (err) {
       setAlert({ type: 'error', message: 'An error occurred. Please try again.' })
@@ -205,10 +217,18 @@ const LoginPage = () => {
           <button
             ref={buttonRef}
             type="submit"
-            disabled={loading}
-            className={`w-full flex items-center justify-center gap-2 bg-yellow text-black font-semibold py-3 rounded-lg hover:bg-white transition duration-300 shadow-lg ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            disabled={loading || loginSuccess}
+            className={`w-full flex items-center justify-center gap-2 bg-yellow text-black font-semibold py-3 rounded-lg transition duration-300 shadow-lg 
+    ${loading || loginSuccess ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white'}`}
           >
-            {loading ? (
+            {loginSuccess ? (
+              <>
+                <FaCheck className="text-lg" />
+                <span ref={successTextRef} className="text-black">
+                  Login successful!
+                </span>
+              </>
+            ) : loading ? (
               <>
                 <span className="loader border-2 border-t-2 border-black w-5 h-5 rounded-full animate-spin"></span>
                 Signing in...
@@ -217,6 +237,7 @@ const LoginPage = () => {
               'Sign In'
             )}
           </button>
+
         </form>
 
         <div className="text-center text-sm text-gray-500 pt-4">

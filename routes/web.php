@@ -12,7 +12,7 @@ use App\Http\Middleware\RedirectIfAuthenticatedToHome;
 use App\Http\Middleware\RedirectIfGuestToHome;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
-
+use App\Http\Controllers\ViewController;
 
 // Public pages
 Route::view('/', 'welcome');
@@ -29,6 +29,8 @@ Route::view('/cart', 'cart');
 Route::view('/checkout', 'checkout');
 Route::view('/signup', 'auth.signup')->middleware(RedirectIfAuthenticatedToHome::class);
 Route::view('/login', 'auth.login')->middleware(RedirectIfAuthenticatedToHome::class);
+Route::view('/orderdetails', 'order-details');
+
 
 // Auth routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -85,3 +87,7 @@ Route::get('/order-confirmation', function () {
 })->middleware(['auth']);
 
 Route::get('/orders/{id}', [OrderController::class, 'show'])->middleware(['auth']);
+
+Route::get('/order-details/{id}', [ViewController::class, 'orderDetailsPage'])->middleware('auth');
+
+Route::get('/my-orders', [OrderController::class, 'getMyOrders']);
