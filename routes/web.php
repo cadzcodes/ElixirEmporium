@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RedirectIfAuthenticatedToHome;
 use App\Http\Middleware\RedirectIfGuestToHome;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\OrderController;
 
 
 // Public pages
@@ -77,3 +78,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/addresses/{id}/default', [AddressController::class, 'setDefault']);
 });
 
+Route::middleware('auth')->post('/orders/place', [OrderController::class, 'place']);
+
+Route::get('/order-confirmation', function () {
+    return view('order-confirmation');
+})->middleware(['auth']);
+
+Route::get('/orders/{id}', [OrderController::class, 'show'])->middleware(['auth']);

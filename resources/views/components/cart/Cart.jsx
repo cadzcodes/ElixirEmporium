@@ -19,7 +19,8 @@ const Cart = () => {
                 const items = res.data.map(item => ({
                     ...item,
                     selected: false,
-                    price: parseFloat(item.price ?? 0)
+                    price: parseFloat(item.price ?? 0),
+                    product_id: item.product?.id ?? item.product_id // Ensure product_id is included
                 }));
                 setCartItems(items);
             })

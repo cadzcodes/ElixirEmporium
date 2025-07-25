@@ -19,7 +19,6 @@ return new class extends Migration {
             $table->string('barangay');
             $table->enum('type', ['home', 'work'])->nullable(); // Optional
             $table->boolean('is_default')->default(false);
-
             $table->timestamps();
         });
     }

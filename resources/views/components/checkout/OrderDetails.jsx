@@ -22,11 +22,14 @@ const OrderDetails = ({ items }) => {
                     <div key={i} className="grid grid-cols-[1fr_160px_60px_160px] items-center gap-4 py-5">
                         {/* Product Info */}
                         <div className="flex items-center gap-4">
-                            <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-16 h-16 rounded-lg border border-yellow/10 object-cover shadow-sm"
-                            />
+                            <div className="w-16 h-16 flex items-center justify-center bg-[#2a2a2a] border border-yellow/10 rounded-lg shadow-sm p-1">
+                                <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="max-w-full max-h-full object-contain"
+                                />
+                            </div>
+
                             <div>
                                 <h4 className="text-base font-semibold text-white">{item.name}</h4>
                                 <p className="text-xs text-gray-500">750ml • Classic</p>

@@ -74,9 +74,43 @@ const CheckoutForm = () => {
     const shippingFee = items.length > 0 ? 100 : 0;
     const total = subtotal + shippingFee;
 
-    const handlePlaceOrder = () => {
-        alert('Order placed! (Connect this to Laravel backend later)');
+    const handlePlaceOrder = async () => {
+        try {
+            const tokenElement = document.querySelector('meta[name="csrf-token"]');
+            if (!tokenElement) throw new Error('CSRF token not found');
+            const csrfToken = tokenElement.getAttribute('content');
+
+            const response = await fetch('/orders/place', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    items,
+                    shipping_id: shipping.id,
+                    payment_method: payment,
+                }),
+            });
+
+            const result = await response.json();
+            console.log("Sending items to backend:", items);
+            
+            if (response.ok) {
+                sessionStorage.removeItem('checkoutItems');
+                window.location.href = `/order-confirmation?order_id=${result.order_id}`;
+            } else {
+                console.error(result);
+                alert('Failed to place order. Please try again.');
+            }
+        } catch (err) {
+            console.error('Order placement error:', err);
+            alert('Error placing order. See console for details.');
+        }
     };
+
 
     return (
         <div className="grid lg:grid-cols-3 gap-12">
