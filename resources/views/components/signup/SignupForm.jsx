@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import gsap from 'gsap'
 import AlertDialog from "../reusables/AlertDialog"
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa'
 
 const SignupForm = ({ formRef }) => {
     const [form, setForm] = useState({ name: '', email: '', password: '' })
@@ -11,6 +11,7 @@ const SignupForm = ({ formRef }) => {
     const [loading, setLoading] = useState(false)
     const [alert, setAlert] = useState(null)
     const [toggle, setToggle] = useState(false)
+    const [signupSuccess, setSignupSuccess] = useState(false)
 
     const buttonRef = useRef(null)
 
@@ -70,6 +71,7 @@ const SignupForm = ({ formRef }) => {
 
                 if (loginRes.ok) {
                     setAlert({ type: 'success', message: 'Registration complete! Logging you in...' })
+                    setSignupSuccess(true)
 
                     setTimeout(() => {
                         window.location.href = '/'
@@ -157,10 +159,16 @@ const SignupForm = ({ formRef }) => {
                     <button
                         ref={buttonRef}
                         type="submit"
-                        disabled={loading}
-                        className={`w-full flex items-center justify-center gap-2 bg-yellow text-black font-semibold py-3 rounded-lg transition duration-300 shadow-lg hover:bg-white ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        disabled={loading || signupSuccess}
+                        className={`w-full flex items-center justify-center gap-2 bg-yellow text-black font-semibold py-3 rounded-lg transition duration-300 shadow-lg 
+        ${loading || signupSuccess ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white'}`}
                     >
-                        {loading ? (
+                        {signupSuccess ? (
+                            <>
+                                <FaCheck className="text-lg" />
+                                <span className="text-black">Logging in...</span>
+                            </>
+                        ) : loading ? (
                             <>
                                 <span className="loader border-2 border-t-2 border-black w-5 h-5 rounded-full animate-spin"></span>
                                 Signing up...
@@ -169,6 +177,7 @@ const SignupForm = ({ formRef }) => {
                             'Sign Up'
                         )}
                     </button>
+
                 </form>
 
                 {status && (

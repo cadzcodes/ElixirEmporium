@@ -209,9 +209,6 @@ const LoginPage = () => {
               />
               Remember me
             </label>
-            <a href="#" className="hover:underline text-yellow">
-              Forgot password?
-            </a>
           </div>
 
           <button
@@ -242,7 +239,7 @@ const LoginPage = () => {
 
         <div className="text-center text-sm text-gray-500 pt-4">
           Don’t have an account?{' '}
-          <a href="#" className="text-yellow hover:underline">
+          <a href="/signup" className="text-yellow hover:underline">
             Register
           </a>
         </div>

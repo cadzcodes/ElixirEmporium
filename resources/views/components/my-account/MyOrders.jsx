@@ -59,7 +59,35 @@ const MyOrders = () => {
             </div>
 
             {paginated.length === 0 ? (
-                <div className="text-center text-white/70">No orders found.</div>
+                <div className="flex flex-col items-center justify-center py-20 text-center border border-yellow/20 rounded-2xl bg-gradient-to-br from-[#1a1a1a] via-[#222] to-[#1a1a1a] shadow-inner relative overflow-hidden">
+                    {/* Glow effect */}
+                    <div className="absolute -top-10 -left-10 w-64 h-64 bg-yellow/10 rounded-full blur-3xl animate-pulse"></div>
+                    <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-yellow/10 rounded-full blur-3xl animate-pulse delay-200"></div>
+
+                    {/* Icon */}
+                    <div className="text-yellow text-6xl mb-6 drop-shadow-lg">
+                        🛍️
+                    </div>
+
+                    {/* Heading */}
+                    <h3 className="text-white text-2xl font-semibold font-modern-negra mb-2 tracking-wide">
+                        No Orders Yet
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-gray-400 max-w-sm mb-6">
+                        Looks like you haven’t placed any orders. Explore our exclusive collection and start your Elixir journey today.
+                    </p>
+
+                    {/* CTA Button */}
+                    <a
+                        href="/"
+                        className="inline-block px-6 py-3 bg-yellow text-black rounded-full font-semibold shadow-md hover:bg-white transition-all"
+                    >
+                        Start Shopping
+                    </a>
+                </div>
+
             ) : (
                 paginated.map(order => (
                     <div
@@ -112,8 +140,8 @@ const MyOrders = () => {
                             key={i + 1}
                             onClick={() => handlePageChange(i + 1)}
                             className={`px-3 py-1 rounded-full border ${page === i + 1
-                                    ? 'bg-yellow text-black'
-                                    : 'text-yellow border-yellow/30 hover:bg-yellow/10'
+                                ? 'bg-yellow text-black'
+                                : 'text-yellow border-yellow/30 hover:bg-yellow/10'
                                 }`}
                         >
                             {i + 1}

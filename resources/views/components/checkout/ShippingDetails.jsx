@@ -2,7 +2,6 @@ import React from 'react';
 import { Home as HomeIcon, Briefcase, Pencil } from 'lucide-react';
 import { FaTruck } from 'react-icons/fa';
 
-
 const ShippingDetails = ({ shipping, loading, onChange }) => {
     if (loading) {
         return (
@@ -14,8 +13,16 @@ const ShippingDetails = ({ shipping, loading, onChange }) => {
 
     if (!shipping) {
         return (
-            <div className="text-center text-gray-400 py-12">
-                <p>No default shipping address found.</p>
+            <div className="border border-yellow/30 rounded-xl p-6 bg-[#1a1a1a] text-center text-white/70">
+                <FaTruck className="mx-auto mb-4 text-yellow text-2xl" />
+                <h3 className="text-xl font-semibold mb-2 text-yellow">No Shipping Address</h3>
+                <p className="mb-4 text-sm text-white/50">You haven’t added a shipping address yet.</p>
+                <button
+                    onClick={onChange}
+                    className="px-4 py-2 rounded-full bg-yellow text-black hover:bg-white transition-colors text-sm font-medium"
+                >
+                    + Add Address
+                </button>
             </div>
         );
     }
@@ -45,12 +52,10 @@ const ShippingDetails = ({ shipping, loading, onChange }) => {
                 <span>Shipping To:</span>
             </h3>
 
-
-
             <div className="relative border border-gray-700 bg-[#111111] rounded-lg p-4">
                 <button
                     className="absolute top-3 right-3 flex items-center gap-1 text-sm text-yellow hover:underline"
-                    onClick={() => console.log('Trigger address change')}
+                    onClick={onChange}
                 >
                     <Pencil size={14} /> Change
                 </button>

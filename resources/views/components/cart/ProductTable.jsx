@@ -1,4 +1,5 @@
 import React from 'react';
+import FancyCheckbox from "../reusables/FancyCheckbox";
 
 const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityChange }) => {
     return (
@@ -6,11 +7,10 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
             {cartItems.length > 0 && (
                 <div className="hidden md:grid grid-cols-12 p-6 rounded-2xl border border-yellow/20 text-gray-400 font-semibold text-sm mb-4 shadow-md backdrop-blur bg-gradient-to-r from-[#1a1a1a]/80 via-[#191919]/80 to-[#1a1a1a]/80">
                     <div className="col-span-5 flex items-center gap-4">
-                        <input
-                            type="checkbox"
-                            className="form-checkbox h-5 w-5 accent-yellow cursor-pointer"
+                        <FancyCheckbox
                             checked={cartItems.every(item => item.selected)}
                             onChange={onSelectAll}
+                            className="mt-1"
                         />
                         <span>Product</span>
                     </div>
@@ -32,12 +32,10 @@ const ProductTable = ({ cartItems, onSelect, onSelectAll, onDelete, onQuantityCh
                     <div className="grid md:grid-cols-12 gap-4">
                         {/* Product */}
                         <div className="md:col-span-5 flex gap-4 items-center">
-                            <input
-                                type="checkbox"
+                            <FancyCheckbox
                                 checked={item.selected}
                                 onChange={() => onSelect(item.id)}
-                                onClick={e => e.stopPropagation()}
-                                className="form-checkbox h-5 w-5 accent-yellow mt-1 cursor-pointer"
+                                className="mt-1"
                             />
                             <img
                                 src={item.image}

@@ -12,7 +12,7 @@ const BenefitSection = ({ iconsRef, carouselImages, carouselIndex, carouselRef }
     return (
         <div className="md:col-span-3 bg-[#151515] flex flex-col items-center justify-center px-10 py-16">
             <div className="flex flex-col items-center text-center space-y-8 w-full max-w-3xl">
-                <h2 className="text-4xl font-modern-negra text-yellow">Why Join Elixir?</h2>
+                <h2 className="text-4xl font-modern-negra text-yellow">Why Join Elixir</h2>
                 <div className="w-full space-y-4">
                     {benefitIcons.map((b, i) => (
                         <BenefitBox
