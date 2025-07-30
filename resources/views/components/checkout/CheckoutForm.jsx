@@ -17,6 +17,7 @@ const CheckoutForm = () => {
     const [showAddressDialog, setShowAddressDialog] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
     const [showSelector, setShowSelector] = useState(false);
+    const [placingOrder, setPlacingOrder] = useState(false);
 
 
     // Fetch cart items from sessionStorage
@@ -85,11 +86,12 @@ const CheckoutForm = () => {
 
     const handlePlaceOrder = async () => {
         if (!shipping) {
-            // No shipping address — shake and block
             setShake(true);
             setTimeout(() => setShake(false), 500);
             return;
         }
+
+        setPlacingOrder(true); // ⬅️ Spinner ON
 
         try {
             const tokenElement = document.querySelector('meta[name="csrf-token"]');
@@ -124,9 +126,10 @@ const CheckoutForm = () => {
         } catch (err) {
             console.error('Order placement error:', err);
             alert('Error placing order. See console for details.');
+        } finally {
+            setPlacingOrder(false); // ⬅️ Spinner OFF
         }
     };
-
 
     return (
         <div className="grid lg:grid-cols-3 gap-12">
@@ -258,6 +261,11 @@ const CheckoutForm = () => {
                     </div>
                 </Dialog>
             </Transition>
+            {placingOrder && (
+                <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-yellow border-solid"></div>
+                </div>
+            )}
         </div>
     );
 };
