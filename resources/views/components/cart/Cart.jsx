@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [checkingOut, setCheckingOut] = useState(false); // for mobile loader
+    const [checkingOut, setCheckingOut] = useState(false);
     const summaryRef = useRef(null);
     const emptyRef = useRef(null);
 
@@ -146,7 +146,21 @@ const Cart = () => {
                         ref={emptyRef}
                         className="flex flex-col items-center justify-center gap-6 text-center py-24 text-yellow/90"
                     >
-                        {/* Empty Cart UI */}
+                        <div className="text-6xl sm:text-7xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 sm:w-28 sm:h-28 mx-auto text-yellow drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m13-9l2 9m-5-4a2 2 0 11-4 0" />
+                            </svg>
+                        </div>
+                        <h3 className="text-3xl sm:text-4xl font-modern-negra tracking-wide">Your Cart is Empty</h3>
+                        <p className="max-w-md text-white/60 text-sm sm:text-base px-4">
+                            Looks like you haven't added anything yet. Explore our collections and find something golden.
+                        </p>
+                        <a
+                            href="/cocktails"
+                            className="inline-block bg-yellow text-black px-6 py-3 rounded-full font-semibold tracking-wide hover:bg-white transition-all shadow-md"
+                        >
+                            Shop Now
+                        </a>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
@@ -171,21 +185,51 @@ const Cart = () => {
 
             {/* ✅ Mobile Checkout Bar */}
             {cartItems.length > 0 && (
-                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-yellow/30 px-6 py-4 z-50">
+                <div className={`lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-yellow/30 px-6 py-4 z-50 ${checkingOut ? 'opacity-80 pointer-events-none' : ''}`}>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
                         <div className="text-white text-sm sm:text-base font-semibold">
                             Subtotal: <span className="text-yellow">₱{subtotal.toFixed(2)}</span><br />
-                            {shipping > 0 && <span className="text-yellow/70 text-sm">+ ₱{shipping.toFixed(2)} Shipping</span>}
+                            {shipping > 0 && (
+                                <span className="text-yellow/70 text-sm">
+                                    + ₱{shipping.toFixed(2)} Shipping
+                                </span>
+                            )}
                         </div>
                         <button
                             disabled={selectedItems.length === 0 || checkingOut}
                             onClick={handleProceedToCheckout}
-                            className={`px-6 py-2 text-sm font-bold rounded-full transition-all duration-300 w-full sm:w-auto ${selectedItems.length && !checkingOut
+                            className={`relative flex items-center justify-center px-6 py-2 text-sm font-bold rounded-full transition-all duration-300 w-full sm:w-auto ${selectedItems.length && !checkingOut
                                 ? 'bg-yellow text-black hover:bg-white shadow-lg'
                                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
-                            {checkingOut ? 'Processing...' : 'Checkout'}
+                            {checkingOut ? (
+                                <>
+                                    <svg
+                                        className="animate-spin h-4 w-4 mr-2 text-black"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                        />
+                                    </svg>
+                                    Processing...
+                                </>
+                            ) : (
+                                'Checkout'
+                            )}
                         </button>
                     </div>
                 </div>
