@@ -6,6 +6,7 @@ import OrderSummary from './OrderSummary';
 import { Dialog, Transition } from '@headlessui/react';
 import { X, MapPin, PlusCircle, Trash2, Home as HomeIcon, Briefcase } from 'lucide-react';
 import AddressForm from "../my-account/AddressForm";
+import AddressSelector from "../reusables/AddressSelector";
 
 const CheckoutForm = () => {
     const [shipping, setShipping] = useState(null);
@@ -15,6 +16,8 @@ const CheckoutForm = () => {
     const [shake, setShake] = useState(false);
     const [showAddressDialog, setShowAddressDialog] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
+    const [showSelector, setShowSelector] = useState(false);
+
 
     // Fetch cart items from sessionStorage
     useEffect(() => {
@@ -131,7 +134,13 @@ const CheckoutForm = () => {
                 <ShippingDetails
                     shipping={shipping}
                     loading={loadingAddress}
-                    onChange={() => setShowAddressDialog(true)}
+                    onChange={() => setShowSelector(true)}
+                />
+                <AddressSelector
+                    open={showSelector}
+                    selectedId={shipping?.id}
+                    onClose={() => setShowSelector(false)}
+                    onSelect={(selectedAddr) => setShipping(selectedAddr)}
                 />
                 <OrderDetails items={items} />
                 <PaymentMethod payment={payment} setPayment={setPayment} />
