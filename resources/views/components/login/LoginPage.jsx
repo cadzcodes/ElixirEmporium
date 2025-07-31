@@ -146,7 +146,7 @@ const LoginPage = () => {
       >
         {/* Logo */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-modern-negra text-yellow">Elixir</h1>
+          <h1 className="text-4xl font-modern-negra text-yellow">Elixir Login</h1>
           <p className="text-gray-400 text-sm">Welcome back. Please sign in.</p>
         </div>
 
