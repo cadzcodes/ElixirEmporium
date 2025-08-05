@@ -171,7 +171,7 @@ const CocktailGrid = ({ searchTerm }) => {
                   />
                   <img
                     loading="lazy"
-                    src={`/${cocktail.image}`}
+                    src={`http://elixirbar.test//${cocktail.image}`}
                     alt={cocktail.name}
                     className="relative z-10 object-contain h-48 transition-transform duration-300"
                   />

@@ -73,7 +73,7 @@ const ProductPage = () => {
           <div className="absolute w-48 h-48 md:w-64 md:h-64 bg-white/25 rounded-full blur-3xl animate-pulse-intense z-0" />
           <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl z-10">
             <img
-              src={`/storage/${product.image}`}
+              src={`http://elixirbar.test//${product.image}`}
               alt={product.name}
               className="object-contain w-full h-full transition-transform duration-500 ease-in-out hover:scale-105"
             />

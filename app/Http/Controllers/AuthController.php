@@ -44,11 +44,20 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
+        $credentials = $request->only('email', 'password');
+
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->user_type === 'admin') {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return response()->json(['message' => 'Login successful']);
         }
 
         return response()->json(['message' => 'Invalid credentials'], 401);
     }
+
 }
