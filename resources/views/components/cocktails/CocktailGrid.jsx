@@ -65,9 +65,12 @@ const CocktailGrid = ({ searchTerm }) => {
     }
   }, [loading, cocktails])
 
-  const filteredCocktails = cocktails.filter((c) =>
-    c.name.toLowerCase().includes((searchTerm || '').toLowerCase())
-  )
+  const filteredCocktails = cocktails.filter((c) => {
+    const term = (searchTerm || '').toLowerCase()
+    const nameMatch = c.name.toLowerCase().includes(term)
+    const tagMatch = (c.tags || '').toLowerCase().includes(term)
+    return nameMatch || tagMatch
+  })
 
   const totalPages = Math.ceil(filteredCocktails.length / cocktailsPerPage)
   const indexOfLast = currentPage * cocktailsPerPage
@@ -158,8 +161,8 @@ const CocktailGrid = ({ searchTerm }) => {
                     ref={(el) => (shadowRefs.current[i] = el)}
                     className="absolute z-0 h-48 w-auto pointer-events-none"
                     style={{
-                      WebkitMaskImage: `url(/${cocktail.image})`,
-                      maskImage: `url(/${cocktail.image})`,
+                      WebkitMaskImage: `url(/${cocktail.image || 'images/missing.png'})`,
+                      maskImage: `url(/${cocktail.image || 'images/missing.png'})`,
                       WebkitMaskRepeat: 'no-repeat',
                       maskRepeat: 'no-repeat',
                       WebkitMaskSize: 'contain',
@@ -169,12 +172,18 @@ const CocktailGrid = ({ searchTerm }) => {
                       height: '100%',
                     }}
                   />
+
                   <img
                     loading="lazy"
-                    src={`http://elixirbar.test//${cocktail.image}`}
+                    src={`http://elixirbar.test/${cocktail.image || 'images/missing.png'}`}
+                    onError={(e) => {
+                      e.target.onerror = null // prevent infinite loop
+                      e.target.src = '/images/missing.png'
+                    }}
                     alt={cocktail.name}
                     className="relative z-10 object-contain h-48 transition-transform duration-300"
                   />
+
                 </div>
 
                 <p className="font-modern-negra text-6xl text-yellow leading-none mt-4 text-center">
@@ -197,8 +206,8 @@ const CocktailGrid = ({ searchTerm }) => {
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className={`px-4 py-2 rounded-full transition-all duration-200 ${currentPage === 1
-                ? 'bg-white/5 text-gray-500 cursor-not-allowed'
-                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+              ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+              : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
           >
             Prev
@@ -209,8 +218,8 @@ const CocktailGrid = ({ searchTerm }) => {
               key={i}
               onClick={() => handlePageChange(i + 1)}
               className={`px-4 py-2 rounded-full transition-all duration-200 ${currentPage === i + 1
-                  ? 'bg-yellow text-black'
-                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                ? 'bg-yellow text-black'
+                : 'bg-white/10 text-gray-300 hover:bg-white/20'
                 }`}
             >
               {i + 1}
@@ -221,8 +230,8 @@ const CocktailGrid = ({ searchTerm }) => {
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className={`px-4 py-2 rounded-full transition-all duration-200 ${currentPage === totalPages
-                ? 'bg-white/5 text-gray-500 cursor-not-allowed'
-                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+              ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+              : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
           >
             Next

@@ -8,6 +8,7 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1)
   const [alerts, setAlerts] = useState([])
   const qtyRef = useRef(null)
+  const isOutOfStock = product.availability !== 'in-stock';
 
   useEffect(() => {
     if (qtyRef.current) {
@@ -98,7 +99,9 @@ const ProductPage = () => {
             <div className="flex items-center border border-gray-400 rounded-full overflow-hidden bg-black/40">
               <button
                 onClick={decrement}
-                className="w-8 h-8 text-lg flex items-center justify-center text-white hover:bg-yellow hover:text-black transition"
+                disabled={isOutOfStock}
+                className={`w-8 h-8 text-lg flex items-center justify-center transition ${isOutOfStock ? 'text-gray-500 cursor-not-allowed' : 'text-white hover:bg-yellow hover:text-black'
+                  }`}
               >
                 -
               </button>
@@ -108,23 +111,28 @@ const ProductPage = () => {
                 inputMode="numeric"
                 value={quantity}
                 onChange={handleManualChange}
-                className="w-12 text-center text-white bg-transparent outline-none"
+                disabled={isOutOfStock}
+                className="w-12 text-center text-white bg-transparent outline-none disabled:cursor-not-allowed"
               />
               <button
                 onClick={increment}
-                className="w-8 h-8 text-lg flex items-center justify-center text-white hover:bg-yellow hover:text-black transition"
+                disabled={isOutOfStock}
+                className={`w-8 h-8 text-lg flex items-center justify-center transition ${isOutOfStock ? 'text-gray-500 cursor-not-allowed' : 'text-white hover:bg-yellow hover:text-black'
+                  }`}
               >
                 +
               </button>
             </div>
           </div>
-
           <button
             onClick={handleAddToCart}
-            disabled={adding}
-            className="cursor-pointer bg-yellow text-black px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-offset-2"
+            disabled={adding || isOutOfStock}
+            className={`cursor-pointer px-6 py-3 rounded-full font-semibold transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${isOutOfStock
+                ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                : 'bg-yellow text-black hover:bg-white hover:shadow-lg focus:ring-yellow'
+              }`}
           >
-            {adding ? 'Adding...' : 'Add to Cart'}
+            {isOutOfStock ? 'Out of Stock' : adding ? 'Adding...' : 'Add to Cart'}
           </button>
 
           <ul className="text-sm text-gray-400 pt-4 space-y-1">

@@ -16,11 +16,14 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
+
     // Optional: Return all products
     public function index()
     {
         return Cache::remember('product_list', 60, function () {
-            return Product::select('id', 'name', 'slug', 'image')->get();
+            return Product::select('id', 'name', 'slug', 'image', 'tags')
+                ->where('availability', 'in-stock') // only on-stock items
+                ->get();
         });
     }
 

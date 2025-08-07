@@ -12,7 +12,9 @@ class Product extends Model
         'description',
         'price',
         'sale_price',
-        'image'
+        'image',
+        'tags',
+        'availability'
     ];
 
     // Automatically generate slug from name
