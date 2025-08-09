@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import gsap from 'gsap';
 import { CheckCircle } from 'lucide-react';
 import { BrowserRouter } from 'react-router-dom';
+import SmoothFollower from "./components/Cursor";
 
 const OrderConfirmation = () => {
     const [order, setOrder] = useState(null);
@@ -46,6 +47,7 @@ const OrderConfirmation = () => {
 
     return (
         <div className="min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center p-6">
+            <SmoothFollower/>
             <div
                 ref={wrapperRef}
                 className="max-w-3xl w-full bg-[#1a1a1a] rounded-3xl p-10 shadow-2xl border border-yellow/20"

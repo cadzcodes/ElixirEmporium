@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping_fee', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
-            $table->enum('status', ['To Ship', 'To Receive', 'Completed', 'Cancelled'])->default('To Ship');
+            $table->enum('status', ['Order Placed','To Ship', 'To Receive', 'Completed', 'Cancelled'])->default('Order Placed');
             $table->timestamp('order_date')->useCurrent();
             $table->timestamp('eta')->nullable(); // Estimated delivery date
             $table->timestamps();

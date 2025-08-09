@@ -2,10 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Navbar from "./components/Navbar";
 import CheckoutForm from "./components/checkout/CheckoutForm";
+import SmoothFollower from "./components/Cursor";
 
 const CheckoutPage = () => {
     return (
         <div className="bg-[#0e0e0e] text-white min-h-screen">
+            <SmoothFollower/>
             <Navbar />
             <div className="pt-32 pb-24 px-4 md:px-16">
                 <h2 className="text-yellow text-4xl md:text-5xl font-modern-negra tracking-widest mb-12 text-center">
