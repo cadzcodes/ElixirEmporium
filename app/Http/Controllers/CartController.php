@@ -6,25 +6,19 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class CartController extends Controller
 {
     public function index()
     {
-        $items = CartItem::with('product')->where('user_id', Auth::id())->get();
+        $response = Http::get("http://127.0.0.1:8000/cart/" . Auth::id());
 
-        return response()->json(
-            $items->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'product_id' => $item->product_id,
-                    'name' => $item->product->name,
-                    'price' => $item->product->price,
-                    'image' => $item->product->image,
-                    'quantity' => $item->quantity,
-                ];
-            })
-        );
+        if ($response->failed()) {
+            abort(500, 'Python API unavailable');
+        }
+
+        return response()->json($response->json());
     }
 
     public function store(Request $request)

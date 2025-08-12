@@ -5,35 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class AddressController extends Controller
 {
     // GET /addresses
     public function index()
     {
-        $addresses = Auth::user()->addresses()->get()->map(function ($address) {
-            return [
-                'id' => $address->id,
-                'full_name' => $address->full_name,
-                'phone' => $address->phone,
-                'address' => $address->address,
-                'unit_number' => $address->unit_number,
-                'province' => $address->province,
-                'city' => $address->city,
-                'barangay' => $address->barangay,
-                'type' => $address->type,
-                'is_default' => $address->is_default,
-                'formatted_address' => implode(', ', array_filter([
-                    $address->unit_number,
-                    $address->barangay,
-                    $address->city,
-                    $address->province
-                ])),
-            ];
-        });
+        $userId = Auth::id();
 
-        return response()->json($addresses);
+        $response = Http::get("http://127.0.0.1:8000/addresses/{$userId}");
+
+        if ($response->failed()) {
+            return response()->json(['error' => 'Unable to fetch addresses'], 500);
+        }
+
+        // Ensure array is preserved
+        return response($response->body(), 200)
+            ->header('Content-Type', 'application/json');
     }
+
 
     // POST /addresses
     public function store(Request $request)
@@ -50,16 +41,21 @@ class AddressController extends Controller
             'is_default' => 'boolean'
         ]);
 
-        if ($request->is_default) {
-            Address::where('user_id', Auth::id())->update(['is_default' => false]);
+        // Add the logged-in user ID
+        $validated['user_id'] = Auth::id();
+
+        $response = Http::withHeaders([
+            'X-User-ID' => Auth::id()
+        ])->post('http://127.0.0.1:8000/addresses', $validated);
+
+        if ($response->failed()) {
+            return response()->json([
+                'message' => 'Failed to save address',
+                'error' => $response->json()
+            ], $response->status());
         }
 
-        $address = Address::create([
-            ...$validated,
-            'user_id' => Auth::id(),
-        ]);
-
-        return response()->json(['message' => 'Address saved successfully', 'address' => $address], 201);
+        return $response->json();
     }
 
     // PUT /addresses/{id}
@@ -91,12 +87,20 @@ class AddressController extends Controller
     // DELETE /addresses/{id}
     public function destroy($id)
     {
-        $address = Address::where('user_id', Auth::id())->findOrFail($id);
+        $response = Http::withHeaders([
+            'X-User-ID' => Auth::id()
+        ])->delete("http://127.0.0.1:8000/addresses/{$id}");
 
-        $address->delete();
+        if ($response->failed()) {
+            return response()->json([
+                'message' => 'Failed to delete address',
+                'error' => $response->json()
+            ], $response->status());
+        }
 
-        return response()->json(['message' => 'Address deleted successfully']);
+        return $response->json();
     }
+
 
     public function setDefault($id)
     {

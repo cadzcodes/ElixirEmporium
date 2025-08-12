@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Address;
+use Illuminate\Support\Facades\Http;
 
 class OrderController extends Controller
 {
@@ -58,45 +59,24 @@ class OrderController extends Controller
     }
 
 
-    public function show($id)
+ public function show(Request $request, $id)
     {
-        $order = Order::with(['items.product', 'address'])->findOrFail($id);
+        // The base URL of your Python API
+        $apiBase = config('services.python_api.base_url', 'http://127.0.0.1:8000');
 
-        if (!$order->address) {
-            \Log::warning("Order {$id} has no address. Address ID: " . $order->address_id);
+        // Call the FastAPI endpoint, sending the user ID from the authenticated user
+        $response = Http::withHeaders([
+            'X-User-ID' => $request->user()->id,
+        ])->get("{$apiBase}/orders/{$id}");
+
+        if ($response->failed()) {
+            return response()->json([
+                'message' => 'Failed to fetch order details',
+                'error' => $response->json(),
+            ], $response->status());
         }
 
-        return response()->json([
-            'id' => $order->id,
-            'status' => $order->status,
-            'payment_method' => $order->payment_method,
-            'shipping_fee' => $order->shipping_fee,
-            'total' => $order->total,
-            'eta' => $order->eta,
-            'created_at' => $order->created_at,
-            'items' => $order->items->map(function ($item) {
-                return [
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product->name ?? 'Product',
-                    'quantity' => $item->quantity,
-                    'image' => $item->product->image ?? null,
-                    'unit_price' => $item->unit_price,
-                    'subtotal' => $item->subtotal,
-                ];
-            }),
-            'shipping' => $order->address ? [
-                'name' => $order->address->full_name,
-                'phone' => $order->address->phone,
-                'address1' => $order->address->address, // formerly line1
-                'address2' => collect([
-                    $order->address->unit_number,
-                    $order->address->barangay,
-                    $order->address->city,
-                    $order->address->province,
-                ])->filter()->join(', '), // safe concatenation
-                'type' => $order->address->type,
-            ] : null,
-        ]);
+        return response()->json($response->json());
     }
 
     public function getMyOrders()
