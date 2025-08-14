@@ -55,20 +55,21 @@ const LoginPage = () => {
   }, [status])
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setAlert(null)
-    setLoading(true)
+    e.preventDefault();
+    setAlert(null);
+    setLoading(true);
 
     gsap.fromTo(buttonRef.current,
       { scale: 1 },
       { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1, ease: "power1.inOut" }
-    )
+    );
 
     try {
       const formData = {
         email: document.getElementById('email').value,
         password: document.getElementById('password').value,
-      }
+        remember: document.getElementById('remember').checked // ✅ send remember state
+      };
 
       const response = await fetch('/login', {
         method: 'POST',
@@ -77,32 +78,31 @@ const LoginPage = () => {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         },
         body: JSON.stringify(formData)
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setAlert({ type: 'error', message: 'Invalid login credentials.' })
+        setAlert({ type: 'error', message: 'Invalid login credentials.' });
       } else {
-        setAlert({ type: 'success', message: 'Login successful!' })
-        setLoginSuccess(true)
+        setAlert({ type: 'success', message: 'Login successful!' });
+        setLoginSuccess(true);
 
-        // Animate the text only
         gsap.fromTo(successTextRef.current,
           { y: 10, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
-        )
+        );
 
         setTimeout(() => {
-          window.location.href = '/'
-        }, 1800)
+          window.location.href = '/';
+        }, 1800);
       }
     } catch (err) {
-      setAlert({ type: 'error', message: 'An error occurred. Please try again.' })
+      setAlert({ type: 'error', message: 'An error occurred. Please try again.' });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="relative min-h-screen bg-[#0e0e0e] flex items-center justify-center px-6 py-12 overflow-hidden">
@@ -205,6 +205,8 @@ const LoginPage = () => {
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
+                id="remember"
+                name="remember"
                 className="accent-yellow w-5 h-5 transition-all duration-200 ease-in-out"
               />
               Remember me

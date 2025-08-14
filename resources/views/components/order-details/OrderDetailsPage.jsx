@@ -13,9 +13,14 @@ const OrderProgress = ({ status }) => {
 
     const currentIndex = stages.findIndex(s => s.label === status);
 
-    // Slightly extend the progress fill to make it visually reach the next stage better
-    const progressPercent = Math.min(((currentIndex + 0.1) / (stages.length - 1)) * 100, 100);
+    const progressMap = {
+        'Order Placed': 13,    // slight start
+        'To Ship': 37,        // stops between first and second
+        'To Receive': 63,     // near last
+        'Completed': 100      // full bar
+    };
 
+    const progressPercent = progressMap[status] ?? 0;
     return (
         <div className="relative mb-12 px-4">
             {/* Background line */}

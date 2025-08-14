@@ -59,7 +59,7 @@ class OrderController extends Controller
     }
 
 
- public function show(Request $request, $id)
+    public function show(Request $request, $id)
     {
         // The base URL of your Python API
         $apiBase = config('services.python_api.base_url', 'http://127.0.0.1:8000');
@@ -82,28 +82,18 @@ class OrderController extends Controller
     public function getMyOrders()
     {
         $user = Auth::user();
+        $apiBase = config('services.python_api.base_url', 'http://127.0.0.1:8000');
 
-        $orders = Order::with('items.product')
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($order) {
-                return [
-                    'id' => $order->id,
-                    'status' => $order->status,
-                    'created_at' => $order->created_at->format('M d, Y'),
-                    'total' => $order->total,
-                    'item_count' => $order->items->sum('quantity'),
-                    'products' => $order->items->map(fn($i) => [
-                        'name' => $i->product->name ?? 'Product',
-                        'image' => $i->product->image ?? null,
-                        'qty' => $i->quantity,
-                    ]),
-                ];
-            });
+        $response = Http::get("{$apiBase}/orders/user/{$user->id}");
 
-        return response()->json($orders);
+        if ($response->failed()) {
+            return response()->json([
+                'message' => 'Failed to fetch orders',
+                'error' => $response->json(),
+            ], $response->status());
+        }
+
+        return response()->json($response->json());
     }
-
 
 }

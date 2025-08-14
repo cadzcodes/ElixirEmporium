@@ -137,7 +137,13 @@ const CheckoutForm = () => {
                 <ShippingDetails
                     shipping={shipping}
                     loading={loadingAddress}
-                    onChange={() => setShowSelector(true)}
+                    onChange={() => {
+                        if (shipping) {
+                            setShowSelector(true);
+                        } else {
+                            setShowAddressDialog(true);
+                        }
+                    }}
                 />
                 <AddressSelector
                     open={showSelector}
