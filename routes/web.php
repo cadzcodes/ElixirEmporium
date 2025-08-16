@@ -13,6 +13,7 @@ use App\Http\Middleware\RedirectIfGuestToHome;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ViewController;
+use App\Models\Order;
 
 // Public pages
 Route::view('/', 'welcome');
@@ -91,3 +92,26 @@ Route::get('/orders/{id}', [OrderController::class, 'show'])->middleware(['auth'
 Route::get('/order-details/{id}', [ViewController::class, 'orderDetailsPage'])->middleware('auth');
 
 Route::get('/my-orders', [OrderController::class, 'getMyOrders']);
+
+Route::get('/payment/success/{order}', function ($orderId) {
+    $order = Order::findOrFail($orderId);
+    // Optionally check payment status via PayMongo API
+    $order->update(['status' => 'Order Placed']);
+    return redirect('/order-confirmation?order_id=' . $order->id);
+})->name('payment.success');
+
+Route::get('/payment/cancel/{order}', function ($orderId) {
+    return redirect('/checkout')->with('error', 'Payment cancelled.');
+})->name('payment.cancel');
+
+Route::post('/webhook/paymongo', function (Request $request) {
+    $event = $request->input('data.attributes.type');
+
+    if ($event === 'payment.paid') {
+        $paymentId = $request->input('data.attributes.data.id');
+        // If you stored PayMongo payment ID in the order, find it and mark as paid
+        Order::where('paymongo_payment_id', $paymentId)->update(['status' => 'Order Placed']);
+    }
+
+    return response()->json(['status' => 'ok']);
+});

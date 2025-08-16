@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Address;
@@ -17,7 +17,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $items = $request->input('items'); // array of { product_id, quantity, price }
+        $items = $request->input('items');
         $shippingId = $request->input('shipping_id');
         $paymentMethod = $request->input('payment_method');
 
@@ -25,6 +25,7 @@ class OrderController extends Controller
         $shippingFee = 100;
         $total = $subtotal + $shippingFee;
 
+        // 1️⃣ Create order in DB
         $order = Order::create([
             'user_id' => $user->id,
             'address_id' => $shippingId,
@@ -32,6 +33,7 @@ class OrderController extends Controller
             'subtotal' => $subtotal,
             'shipping_fee' => $shippingFee,
             'total' => $total,
+            'status' => 'pending', // so it's updated after payment
             'eta' => now()->addDays(3),
         ]);
 
@@ -45,18 +47,49 @@ class OrderController extends Controller
             ]);
         }
 
-        // ✅ Remove the ordered items from user's cart
+        // Remove from cart
         $orderedProductIds = collect($items)->pluck('product_id')->toArray();
-
-        \App\Models\CartItem::where('user_id', $user->id)
+        CartItem::where('user_id', $user->id)
             ->whereIn('product_id', $orderedProductIds)
             ->delete();
 
+        // 2️⃣ If payment is GCash or Maya, create PayMongo checkout session
+        if (in_array($paymentMethod, ['gcash', 'paymaya'])) {
+            $session = Http::withBasicAuth(env('PAYMONGO_SECRET_KEY'), '')
+                ->post('https://api.paymongo.com/v1/checkout_sessions', [
+                    'data' => [
+                        'attributes' => [
+                            'line_items' => [
+                                [
+                                    'name' => 'Order #' . $order->id,
+                                    'amount' => intval($total * 100), // centavos
+                                    'currency' => 'PHP',
+                                    'quantity' => 1,
+                                ]
+                            ],
+                            'payment_method_types' => [$paymentMethod],
+                            'success_url' => route('payment.success', ['order' => $order->id]),
+                            'cancel_url' => route('payment.cancel', ['order' => $order->id]),
+                        ]
+                    ]
+                ])->json();
+
+            if (isset($session['data']['attributes']['checkout_url'])) {
+                return response()->json([
+                    'redirect_url' => $session['data']['attributes']['checkout_url']
+                ]);
+            }
+
+            return response()->json(['error' => 'Failed to create PayMongo session'], 500);
+        }
+
+        // 3️⃣ Otherwise, proceed as normal (e.g., COD)
         return response()->json([
             'message' => 'Order placed',
             'order_id' => $order->id
         ]);
     }
+
 
 
     public function show(Request $request, $id)

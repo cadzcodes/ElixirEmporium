@@ -1,16 +1,24 @@
 import React from 'react'
 import { FaCreditCard } from 'react-icons/fa';
 
-import { CheckCircle2, CreditCard, DollarSign, Wallet, Smartphone } from 'lucide-react';
-
+import { CheckCircle2, HandCoins, DollarSign, Wallet, Smartphone } from 'lucide-react';
 const methodIcons = {
-    'Credit Card': <CreditCard className="text-yellow w-7 h-7" />,
+    'paymaya': <HandCoins className="text-yellow w-7 h-7" />,
     'PayPal': <Wallet className="text-yellow w-7 h-7" />,
-    'GCash': <Smartphone className="text-yellow w-7 h-7" />,
+    'gcash': <Smartphone className="text-yellow w-7 h-7" />,
     'Cash on Delivery': <DollarSign className="text-yellow w-7 h-7" />,
 };
 
-const paymentOptions = ['Credit Card', 'PayPal', 'GCash', 'Cash on Delivery'];
+// Backend values
+const paymentOptions = ['paymaya', 'PayPal', 'gcash', 'Cash on Delivery'];
+
+// UI display names
+const methodLabels = {
+    'gcash': 'GCash',
+    'paymaya': 'Maya',
+    'PayPal': 'PayPal',
+    'Cash on Delivery': 'Cash on Delivery'
+};
 
 const PaymentMethod = ({ payment, setPayment }) => {
     return (
@@ -35,7 +43,9 @@ const PaymentMethod = ({ payment, setPayment }) => {
                         >
                             <div className="flex items-center gap-4">
                                 {methodIcons[method]}
-                                <span className="text-white text-lg">{method}</span>
+                                <span className="text-white text-lg">
+                                    {methodLabels[method] || method}
+                                </span>
                             </div>
 
                             {isSelected ? (

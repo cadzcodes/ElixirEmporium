@@ -11,7 +11,7 @@ import AddressSelector from "../reusables/AddressSelector";
 const CheckoutForm = () => {
     const [shipping, setShipping] = useState(null);
     const [loadingAddress, setLoadingAddress] = useState(true);
-    const [payment, setPayment] = useState('Credit Card');
+    const [payment, setPayment] = useState('gcash');
     const [items, setItems] = useState([]);
     const [shake, setShake] = useState(false);
     const [showAddressDialog, setShowAddressDialog] = useState(false);
@@ -117,8 +117,14 @@ const CheckoutForm = () => {
             console.log("Sending items to backend:", items);
 
             if (response.ok) {
-                sessionStorage.removeItem('checkoutItems');
-                window.location.href = `/order-confirmation?order_id=${result.order_id}`;
+                if (result.redirect_url) {
+                    // If PayMongo session was created, redirect to their checkout
+                    window.location.href = result.redirect_url;
+                } else {
+                    // COD or other free payment
+                    sessionStorage.removeItem('checkoutItems');
+                    window.location.href = `/order-confirmation?order_id=${result.order_id}`;
+                }
             } else {
                 console.error(result);
                 alert('Failed to place order. Please try again.');
