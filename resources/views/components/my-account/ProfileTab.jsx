@@ -61,7 +61,9 @@ const ProfileTab = forwardRef((props, ref) => {
 
         switch (field) {
             case 'name':
-                if (!value || value.trim().length < 3) {
+                if (!/^[a-zA-Z\s]+$/.test(value)) {
+                    newErrors.name = 'Name can only contain letters and spaces';
+                } else if (value.trim().length < 3) {
                     newErrors.name = 'Name must be at least 3 characters';
                 } else {
                     delete newErrors.name;
@@ -149,12 +151,13 @@ const ProfileTab = forwardRef((props, ref) => {
 
 
     const handleSave = async () => {
-        // Validate all before save
-        ['name', 'email', 'phone', 'date_of_birth'].forEach((field) =>
-            validateField(field, form[field])
-        );
+        const fieldsToValidate = ['name', 'email', 'phone', 'date_of_birth'];
+        const freshErrors = {};
+        fieldsToValidate.forEach((field) => {
+            validateField(field, form[field]);
+        });
 
-        if (Object.keys(errors).length > 0) {
+        if (Object.keys(errors).length > 0 || Object.keys(freshErrors).length > 0) {
             setDialogContent({
                 title: 'Validation Error',
                 message: 'Please fix the form errors before saving.',
@@ -196,7 +199,6 @@ const ProfileTab = forwardRef((props, ref) => {
             return false;
         }
     };
-
 
 
     const censoredPhone = user.phone ? user.phone.replace(/.(?=.{3})/g, '*') : 'Not provided';
@@ -309,11 +311,15 @@ const ProfileTab = forwardRef((props, ref) => {
                     <label className="block text-sm text-gray-400 mb-1">Date of Birth</label>
                     <input
                         type="date"
-                        className={`bg-[#1a1a1a] px-3 py-2 w-1/2 md:w-1/3 rounded-lg border text-white cursor-pointer ${errors.date_of_birth ? 'border-red-500' : 'border-yellow/20'
-                            } [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-80`}
+                        className={`bg-[#1a1a1a] px-3 py-2 w-1/2 md:w-1/3 rounded-lg border text-white cursor-pointer 
+        ${errors.date_of_birth ? 'border-red-500' : 'border-yellow/20'}
+        [&::-webkit-calendar-picker-indicator]:invert 
+        [&::-webkit-calendar-picker-indicator]:opacity-80`}
                         value={form.date_of_birth}
                         onChange={(e) => handleChange('date_of_birth', e.target.value)}
                         onBlur={(e) => handleBlur('date_of_birth', e.target.value)}
+                        max={dayjs().subtract(18, 'year').format('YYYY-MM-DD')}
+                        min="1900-01-01"
                     />
                     {errors.date_of_birth && (
                         <p className="text-red-500 text-sm mt-1">{errors.date_of_birth}</p>
@@ -324,12 +330,15 @@ const ProfileTab = forwardRef((props, ref) => {
                 <div className="pt-6">
                     <button
                         onClick={handleSave}
-                        disabled={!unsavedChanges}
-                        className={`px-6 py-3 text-black font-bold rounded-xl transition-all duration-200 ${unsavedChanges ? 'bg-yellow hover:bg-white' : 'bg-gray-600 cursor-not-allowed'
-                            }`}
+                        disabled={!unsavedChanges || Object.keys(errors).length > 0}
+                        className={`px-6 py-3 text-black font-bold rounded-xl transition-all duration-200 
+        ${(!unsavedChanges || Object.keys(errors).length > 0)
+                                ? 'bg-gray-600 cursor-not-allowed'
+                                : 'bg-yellow hover:bg-white'}`}
                     >
                         Save Changes
                     </button>
+
                 </div>
             </div>
 

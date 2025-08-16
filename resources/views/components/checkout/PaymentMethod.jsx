@@ -1,12 +1,12 @@
 import React from 'react'
 import { FaCreditCard } from 'react-icons/fa';
+import { CheckCircle2, DollarSign } from 'lucide-react';
 
-import { CheckCircle2, HandCoins, DollarSign, Wallet, Smartphone } from 'lucide-react';
 const methodIcons = {
-    'paymaya': <HandCoins className="text-yellow w-7 h-7" />,
-    'PayPal': <Wallet className="text-yellow w-7 h-7" />,
-    'gcash': <Smartphone className="text-yellow w-7 h-7" />,
-    'Cash on Delivery': <DollarSign className="text-yellow w-7 h-7" />,
+  'paymaya': <img src="/images/maya.png" alt="Maya" className="w-8 h-8 object-contain" />,
+  'PayPal': <img src="/images/paypal.png" alt="PayPal" className="w-8 h-8 object-contain" />,
+  'gcash': <img src="/images/gcash.png" alt="GCash" className="w-8 h-8 object-contain" />,
+  'Cash on Delivery': <DollarSign className="text-yellow w-7 h-7" />,
 };
 
 // Backend values
