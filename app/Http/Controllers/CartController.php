@@ -12,8 +12,10 @@ class CartController extends Controller
 {
     public function index()
     {
-        $response = Http::get("http://127.0.0.1:8000/cart/" . Auth::id());
+        $apiBase = config('services.python_api.base_url');
 
+        $response = Http::get($apiBase . "/cart/" . Auth::id());
+        
         if ($response->failed()) {
             abort(500, 'Python API unavailable');
         }

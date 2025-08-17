@@ -4,19 +4,19 @@ import { CheckCircle2, DollarSign } from 'lucide-react';
 
 const methodIcons = {
   'paymaya': <img src="/images/maya.png" alt="Maya" className="w-8 h-8 object-contain" />,
-  'PayPal': <img src="/images/paypal.png" alt="PayPal" className="w-8 h-8 object-contain" />,
+  'paypal': <img src="/images/paypal.png" alt="PayPal" className="w-8 h-8 object-contain" />,
   'gcash': <img src="/images/gcash.png" alt="GCash" className="w-8 h-8 object-contain" />,
   'Cash on Delivery': <DollarSign className="text-yellow w-7 h-7" />,
 };
 
 // Backend values
-const paymentOptions = ['paymaya', 'PayPal', 'gcash', 'Cash on Delivery'];
+const paymentOptions = ['paymaya', 'paypal', 'gcash', 'Cash on Delivery'];
 
 // UI display names
 const methodLabels = {
     'gcash': 'GCash',
     'paymaya': 'Maya',
-    'PayPal': 'PayPal',
+    'paypal': 'PayPal',
     'Cash on Delivery': 'Cash on Delivery'
 };
 

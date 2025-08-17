@@ -8,7 +8,7 @@ import { AlertTriangle } from 'lucide-react';
 import SmoothFollower from "./components/Cursor";
 
 const MyAccount = () => {
-    const [activeTab, setActiveTab] = useState('profile');
+    const [activeTab, setActiveTab] = useState(window.__DEFAULT_TAB__ || 'profile');
     const [unsavedChanges, setUnsavedChanges] = useState(false);
     const [pendingTab, setPendingTab] = useState(null);
     const [showPrompt, setShowPrompt] = useState(false);

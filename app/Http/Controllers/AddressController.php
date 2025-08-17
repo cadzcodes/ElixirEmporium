@@ -14,7 +14,9 @@ class AddressController extends Controller
     {
         $userId = Auth::id();
 
-        $response = Http::get("http://127.0.0.1:8000/addresses/{$userId}");
+        $apiBase = config('services.python_api.base_url');
+
+        $response = Http::get("{$apiBase}/addresses/{$userId}");
 
         if ($response->failed()) {
             return response()->json(['error' => 'Unable to fetch addresses'], 500);
@@ -44,9 +46,11 @@ class AddressController extends Controller
         // Add the logged-in user ID
         $validated['user_id'] = Auth::id();
 
+        $apiBase = config('services.python_api.base_url');
+
         $response = Http::withHeaders([
             'X-User-ID' => Auth::id()
-        ])->post('http://127.0.0.1:8000/addresses', $validated);
+        ])->post("{$apiBase}/addresses", $validated);
 
         if ($response->failed()) {
             return response()->json([
@@ -87,9 +91,11 @@ class AddressController extends Controller
     // DELETE /addresses/{id}
     public function destroy($id)
     {
+        $apiBase = config('services.python_api.base_url');
+
         $response = Http::withHeaders([
             'X-User-ID' => Auth::id()
-        ])->delete("http://127.0.0.1:8000/addresses/{$id}");
+        ])->delete("{$apiBase}/addresses/{$id}");
 
         if ($response->failed()) {
             return response()->json([

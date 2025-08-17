@@ -13,6 +13,7 @@ use App\Http\Middleware\RedirectIfGuestToHome;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ViewController;
+use App\Http\Controllers\ContactController;
 use App\Models\Order;
 
 // Public pages
@@ -22,9 +23,10 @@ Route::view('/product', 'product');
 Route::view('/about', 'about');
 Route::view('/art', 'art');
 Route::view('/contact', 'contact');
-Route::get('/account', function () {
-    $user = auth()->user()->load('addresses'); // ✅ eager load addresses
-    return view('account', compact('user'));
+Route::get('/account', function (Request $request) {
+    $user = auth()->user()->load('addresses');
+    $defaultTab = $request->query('tab', 'profile'); // fallback to profile if not set
+    return view('account', compact('user', 'defaultTab'));
 })->middleware(RedirectIfGuestToHome::class);
 Route::view('/cart', 'cart');
 Route::view('/checkout', 'checkout');
@@ -115,3 +117,8 @@ Route::post('/webhook/paymongo', function (Request $request) {
 
     return response()->json(['status' => 'ok']);
 });
+
+Route::get('/payment/success/{order}', [OrderController::class, 'paypalSuccess'])->name('payment.success');
+Route::get('/payment/cancel/{order}', [OrderController::class, 'paypalCancel'])->name('payment.cancel');
+
+Route::post('/contact', [ContactController::class, 'send']);

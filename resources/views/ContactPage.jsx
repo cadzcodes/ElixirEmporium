@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ReactDOM from 'react-dom/client';
 import Navbar from "./components/Navbar";
 import AccordionItem from "./components/contact/AccordionItem";
 import SmoothFollower from "./components/Cursor";
+import AlertDialog from "./components/reusables/AlertDialog";
+
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -12,6 +14,61 @@ const ContactPage = () => {
     const formRef = useRef(null)
     const sectionRef = useRef(null)
     const ctaRef = useRef(null)
+
+    const [loading, setLoading] = useState(false)
+    const [alertData, setAlertData] = useState(null);
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const name = e.target[0].value.trim();
+        const email = e.target[1].value.trim();
+        const message = e.target[2].value.trim();
+
+        // ✅ Email regex: RFC 5322 simplified but strict
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // ✅ Validate inputs
+        if (!name || !email || !message) {
+            setAlertData({ type: "error", message: "All fields are required." });
+            return;
+        }
+
+        if (!emailRegex.test(email)) {
+            setAlertData({ type: "error", message: "Please enter a valid email address." });
+            return;
+        }
+
+        setLoading(true); // 👈 start loading
+
+        const formData = { name, email, message };
+
+        try {
+            const response = await fetch('/contact', {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setAlertData({ type: "success", message: data.message || "Message sent successfully!" });
+                e.target.reset();
+            } else {
+                setAlertData({ type: "error", message: data.message || "Failed to send message." });
+            }
+        } catch (error) {
+            setAlertData({ type: "error", message: "Failed to send message." });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         gsap.from(sectionRef.current, {
@@ -72,7 +129,7 @@ const ContactPage = () => {
                     ref={formRef}
                     className="max-w-4xl mx-auto bg-[#1a1a1a] p-10 rounded-2xl shadow-2xl border border-yellow/30 backdrop-blur-md"
                 >
-                    <form className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={handleSubmit}>
                         <div className="col-span-1">
                             <label className="block text-sm mb-2 text-yellow">Full Name</label>
                             <input
@@ -103,9 +160,18 @@ const ContactPage = () => {
                         <div className="col-span-1 md:col-span-2 text-center">
                             <button
                                 type="submit"
-                                className="bg-yellow text-black font-semibold py-3 px-10 rounded-full hover:bg-white transition duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow"
+                                disabled={loading} // 👈 disable while sending
+                                className={`bg-yellow text-black font-semibold py-3 px-10 rounded-full transition duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow 
+                                    ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white'}`}
                             >
-                                Send Message
+                                {loading ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <span className="animate-spin border-2 border-black border-t-transparent rounded-full w-5 h-5"></span>
+                                        Sending...
+                                    </div>
+                                ) : (
+                                    "Send Message"
+                                )}
                             </button>
                         </div>
                     </form>
@@ -164,6 +230,14 @@ const ContactPage = () => {
                     <p className="text-xl font-medium">📧 contact@elixiremporium.com</p>
                 </div>
             </section>
+            {/* Alert Dialog */}
+            {alertData && (
+                <AlertDialog
+                    type={alertData.type}
+                    message={alertData.message}
+                    onClose={() => setAlertData(null)}
+                />
+            )}
         </div>
     )
 }

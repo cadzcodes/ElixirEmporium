@@ -156,6 +156,21 @@ const SignupForm = ({ formRef }) => {
                         </div>
                     ))}
 
+                    {/* ✅ Terms & Services Checkbox */}
+                    <div className="flex items-center gap-3 text-sm text-gray-400">
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            name="terms"
+                            required
+                            className="accent-yellow w-5 h-5 transition-all duration-200 ease-in-out"
+                        />
+                        <label htmlFor="terms">
+                            I agree to the <a href="/terms" className="text-yellow hover:underline">Terms of Service</a>
+                            {' '}and <a href="/privacy" className="text-yellow hover:underline">Privacy Policy</a>
+                        </label>
+                    </div>
+
                     <button
                         ref={buttonRef}
                         type="submit"

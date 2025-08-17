@@ -47,7 +47,7 @@ const OrderConfirmation = () => {
 
     return (
         <div className="min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center p-6">
-            <SmoothFollower/>
+            <SmoothFollower />
             <div
                 ref={wrapperRef}
                 className="max-w-3xl w-full bg-[#1a1a1a] rounded-3xl p-10 shadow-2xl border border-yellow/20"
@@ -106,7 +106,7 @@ const OrderConfirmation = () => {
 
                 <div className="flex justify-end gap-4">
                     <button
-                        onClick={() => window.location.href = '/account'}
+                        onClick={() => window.location.href = '/account?tab=orders'}
                         className="px-6 py-3 bg-yellow/20 border border-yellow text-yellow font-semibold rounded-xl hover:bg-yellow/30 transition duration-300"
                     >
                         View My Orders

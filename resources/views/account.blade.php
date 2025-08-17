@@ -14,6 +14,7 @@
 <script>
     window.__USER__ = @json(Auth::user());
     window.__ADDRESSES__ = @json($user->addresses);
+    window.__DEFAULT_TAB__ = @json($defaultTab);
 </script>
 
 </html>

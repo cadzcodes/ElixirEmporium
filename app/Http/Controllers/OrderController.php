@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Address;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -47,6 +48,15 @@ class OrderController extends Controller
             ]);
         }
 
+        Mail::send('emails.order_confirmation', [
+            'user' => $user,
+            'order' => $order,
+            'items' => $items
+        ], function ($mail) use ($user, $order) {
+            $mail->to($user->email, $user->name)
+                ->subject('Order Confirmation - Order #' . $order->id);
+        });
+
         // Remove from cart
         $orderedProductIds = collect($items)->pluck('product_id')->toArray();
         CartItem::where('user_id', $user->id)
@@ -83,11 +93,91 @@ class OrderController extends Controller
             return response()->json(['error' => 'Failed to create PayMongo session'], 500);
         }
 
+        if ($paymentMethod === 'paypal') {
+            // 1️⃣ Get access token
+            $auth = Http::asForm()->withBasicAuth(
+                env('PAYPAL_CLIENT_ID'),
+                env('PAYPAL_SECRET')
+            )->post('https://api-m.sandbox.paypal.com/v1/oauth2/token', [
+                        'grant_type' => 'client_credentials'
+                    ])->json();
+
+            $accessToken = $auth['access_token'] ?? null;
+
+            if (!$accessToken) {
+                return response()->json(['error' => 'Failed to authenticate with PayPal'], 500);
+            }
+
+            // 2️⃣ Create PayPal order
+            $paypalOrder = Http::withToken($accessToken)
+                ->post('https://api-m.sandbox.paypal.com/v2/checkout/orders', [
+                    'intent' => 'CAPTURE',
+                    'purchase_units' => [
+                        [
+                            'reference_id' => $order->id,
+                            'amount' => [
+                                'currency_code' => 'PHP',
+                                'value' => number_format($total, 2, '.', '')
+                            ]
+                        ]
+                    ],
+                    'application_context' => [
+                        'brand_name' => 'My Store',
+                        'landing_page' => 'LOGIN',
+                        'user_action' => 'PAY_NOW',
+                        'return_url' => route('payment.success', ['order' => $order->id]),
+                        'cancel_url' => route('payment.cancel', ['order' => $order->id]),
+                    ]
+                ])->json();
+
+            // 3️⃣ Return approval link to frontend
+            if (!empty($paypalOrder['links'])) {
+                $approveLink = collect($paypalOrder['links'])
+                    ->firstWhere('rel', 'approve')['href'] ?? null;
+
+                if ($approveLink) {
+                    return response()->json([
+                        'redirect_url' => $approveLink
+                    ]);
+                }
+            }
+
+            return response()->json(['error' => 'Failed to create PayPal order'], 500);
+        }
+
         // 3️⃣ Otherwise, proceed as normal (e.g., COD)
         return response()->json([
             'message' => 'Order placed',
             'order_id' => $order->id
         ]);
+    }
+
+
+    public function paypalSuccess(Request $request, $orderId)
+    {
+        $paypalOrderId = $request->query('token'); // PayPal sends ?token=EC-xxxx
+
+        // 1️⃣ Get access token again
+        $auth = Http::asForm()->withBasicAuth(
+            env('PAYPAL_CLIENT_ID'),
+            env('PAYPAL_SECRET')
+        )->post('https://api-m.sandbox.paypal.com/v1/oauth2/token', [
+                    'grant_type' => 'client_credentials'
+                ])->json();
+
+        $accessToken = $auth['access_token'] ?? null;
+
+        // 2️⃣ Capture payment
+        $capture = Http::withToken($accessToken)
+            ->post("https://api-m.sandbox.paypal.com/v2/checkout/orders/{$paypalOrderId}/capture")
+            ->json();
+
+        // 3️⃣ Update order status
+        $order = Order::findOrFail($orderId);
+        $order->status = 'Order Placed';
+        $order->save();
+
+        return redirect()->to("/order-confirmation?order_id={$order->id}");
     }
 
 
