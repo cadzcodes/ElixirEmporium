@@ -175,7 +175,7 @@ const CocktailGrid = ({ searchTerm }) => {
 
                   <img
                     loading="lazy"
-                    src={`http://elixirbar.test/${cocktail.image || 'images/missing.png'}`}
+                    src={`http://localhost:8080/${cocktail.image || 'images/missing.png'}`}
                     onError={(e) => {
                       e.target.onerror = null // prevent infinite loop
                       e.target.src = '/images/missing.png'

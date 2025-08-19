@@ -4,7 +4,8 @@ services:
     container_name: laravel
     working_dir: /var/www
     volumes:
-      - laraveldata:/var/www    # Full Laravel project inside named volume
+      # - laraveldata:/var/www # Production
+      - ./:/var/www # Development
     networks:
       - appnet
     depends_on:
@@ -38,6 +39,22 @@ services:
       - dbdata:/var/lib/mysql
     networks:
       - appnet
+  
+  python-api:
+    build:
+      context: ./python-api   # folder where your FastAPI code lives
+      dockerfile: Dockerfile
+    container_name: python-api
+    working_dir: /app
+    volumes:
+      - ./python-api:/app
+    ports:
+      - "8000:8000"   # optional for host access
+    networks:
+      - appnet
+    depends_on:
+      - mysql
+
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
