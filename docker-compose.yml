@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   laravel:
-    image: demo/laravel:0.1
+    image: laravel
     container_name: laravel
     working_dir: /var/www
     volumes:
@@ -17,7 +15,7 @@ services:
     container_name: nginx
     user: root
     volumes:
-      - laraveldata:/var/www:cached
+      - laraveldata:/var/www:cached  # Mount same volume for Nginx
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8080:80"
@@ -32,29 +30,28 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
     networks:
       - appnet
-  
+
   phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin_app
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
     environment:
       PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root
       PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
     ports:
-     - "8000:80"
+      - "8081:80"
     depends_on:
-     - mysql
+      - mysql
     networks:
-     - appnet
-
+      - appnet
 
 volumes:
   laraveldata:
