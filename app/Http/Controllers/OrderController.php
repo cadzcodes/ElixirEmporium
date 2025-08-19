@@ -7,17 +7,23 @@ use App\Models\Order;
 use App\Models\CartItem;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Address;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use App\Services\Payments\PaymentGatewayManager;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    protected PaymentGatewayManager $paymentGatewayManager;
+
+    public function __construct(PaymentGatewayManager $paymentGatewayManager)
+    {
+        $this->paymentGatewayManager = $paymentGatewayManager;
+    }
 
     public function place(Request $request)
     {
         $user = Auth::user();
-
         $items = $request->input('items');
         $shippingId = $request->input('shipping_id');
         $paymentMethod = $request->input('payment_method');
@@ -26,7 +32,6 @@ class OrderController extends Controller
         $shippingFee = 100;
         $total = $subtotal + $shippingFee;
 
-        // 1️⃣ Create order in DB
         $order = Order::create([
             'user_id' => $user->id,
             'address_id' => $shippingId,
@@ -34,7 +39,7 @@ class OrderController extends Controller
             'subtotal' => $subtotal,
             'shipping_fee' => $shippingFee,
             'total' => $total,
-            'status' => 'pending', // so it's updated after payment
+            'status' => 'pending',
             'eta' => now()->addDays(3),
         ]);
 
@@ -48,6 +53,7 @@ class OrderController extends Controller
             ]);
         }
 
+        // Send confirmation email...
         Mail::send('emails.order_confirmation', [
             'user' => $user,
             'order' => $order,
@@ -58,100 +64,46 @@ class OrderController extends Controller
         });
 
         // Remove from cart
-        $orderedProductIds = collect($items)->pluck('product_id')->toArray();
         CartItem::where('user_id', $user->id)
-            ->whereIn('product_id', $orderedProductIds)
+            ->whereIn('product_id', collect($items)->pluck('product_id'))
             ->delete();
 
-        // 2️⃣ If payment is GCash or Maya, create PayMongo checkout session
-        if (in_array($paymentMethod, ['gcash', 'paymaya'])) {
-            $session = Http::withBasicAuth(env('PAYMONGO_SECRET_KEY'), '')
-                ->post('https://api.paymongo.com/v1/checkout_sessions', [
-                    'data' => [
-                        'attributes' => [
-                            'line_items' => [
-                                [
-                                    'name' => 'Order #' . $order->id,
-                                    'amount' => intval($total * 100), // centavos
-                                    'currency' => 'PHP',
-                                    'quantity' => 1,
-                                ]
-                            ],
-                            'payment_method_types' => [$paymentMethod],
-                            'success_url' => route('payment.success', ['order' => $order->id]),
-                            'cancel_url' => route('payment.cancel', ['order' => $order->id]),
-                        ]
-                    ]
-                ])->json();
+        // ✅ Get correct gateway based on $paymentMethod
+        $gateway = $this->paymentGatewayManager->resolve($paymentMethod);
 
-            if (isset($session['data']['attributes']['checkout_url'])) {
-                return response()->json([
-                    'redirect_url' => $session['data']['attributes']['checkout_url']
-                ]);
+        try {
+            $redirectUrl = $gateway->createCheckout($order, $total);
+
+            if ($redirectUrl) {
+                return response()->json(['redirect_url' => $redirectUrl]);
             }
 
-            return response()->json(['error' => 'Failed to create PayMongo session'], 500);
+            return response()->json([
+                'message' => 'Order placed',
+                'order_id' => $order->id
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Payment failed: ' . $e->getMessage(),
+                'order_id' => $order->id
+            ], 500);
         }
-
-        if ($paymentMethod === 'paypal') {
-            // 1️⃣ Get access token
-            $auth = Http::asForm()->withBasicAuth(
-                env('PAYPAL_CLIENT_ID'),
-                env('PAYPAL_SECRET')
-            )->post('https://api-m.sandbox.paypal.com/v1/oauth2/token', [
-                        'grant_type' => 'client_credentials'
-                    ])->json();
-
-            $accessToken = $auth['access_token'] ?? null;
-
-            if (!$accessToken) {
-                return response()->json(['error' => 'Failed to authenticate with PayPal'], 500);
-            }
-
-            // 2️⃣ Create PayPal order
-            $paypalOrder = Http::withToken($accessToken)
-                ->post('https://api-m.sandbox.paypal.com/v2/checkout/orders', [
-                    'intent' => 'CAPTURE',
-                    'purchase_units' => [
-                        [
-                            'reference_id' => $order->id,
-                            'amount' => [
-                                'currency_code' => 'PHP',
-                                'value' => number_format($total, 2, '.', '')
-                            ]
-                        ]
-                    ],
-                    'application_context' => [
-                        'brand_name' => 'My Store',
-                        'landing_page' => 'LOGIN',
-                        'user_action' => 'PAY_NOW',
-                        'return_url' => route('payment.success', ['order' => $order->id]),
-                        'cancel_url' => route('payment.cancel', ['order' => $order->id]),
-                    ]
-                ])->json();
-
-            // 3️⃣ Return approval link to frontend
-            if (!empty($paypalOrder['links'])) {
-                $approveLink = collect($paypalOrder['links'])
-                    ->firstWhere('rel', 'approve')['href'] ?? null;
-
-                if ($approveLink) {
-                    return response()->json([
-                        'redirect_url' => $approveLink
-                    ]);
-                }
-            }
-
-            return response()->json(['error' => 'Failed to create PayPal order'], 500);
-        }
-
-        // 3️⃣ Otherwise, proceed as normal (e.g., COD)
-        return response()->json([
-            'message' => 'Order placed',
-            'order_id' => $order->id
-        ]);
     }
 
+    public function paymentSuccess(Request $request, $orderId)
+    {
+        $order = Order::findOrFail($orderId);
+
+        // ✅ Resolve gateway dynamically
+        $gateway = $this->paymentGatewayManager->resolve($order->payment_method);
+
+        $gateway->handleSuccess($request, $orderId);
+
+        $order->status = 'Order Placed';
+        $order->save();
+
+        return redirect()->to("/order-confirmation?order_id={$order->id}");
+    }
 
     public function paypalSuccess(Request $request, $orderId)
     {
@@ -184,11 +136,9 @@ class OrderController extends Controller
 
     public function show(Request $request, $id)
     {
-        // The base URL of your Python API
         $apiBase = config('services.python_api.base_url', 'http://127.0.0.1:8000');
 
-        // Call the FastAPI endpoint, sending the user ID from the authenticated user
-        $response = Http::withHeaders([
+        $response = \Http::withHeaders([
             'X-User-ID' => $request->user()->id,
         ])->get("{$apiBase}/orders/{$id}");
 
@@ -207,7 +157,7 @@ class OrderController extends Controller
         $user = Auth::user();
         $apiBase = config('services.python_api.base_url', 'http://127.0.0.1:8000');
 
-        $response = Http::get("{$apiBase}/orders/user/{$user->id}");
+        $response = \Http::get("{$apiBase}/orders/user/{$user->id}");
 
         if ($response->failed()) {
             return response()->json([
@@ -218,5 +168,4 @@ class OrderController extends Controller
 
         return response()->json($response->json());
     }
-
 }

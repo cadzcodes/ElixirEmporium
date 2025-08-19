@@ -23,7 +23,7 @@ const Navbar = () => {
     const fetchUser = async () => {
       try {
         const response = await fetch('/user', {
-          credentials: 'include', // Needed to send session cookie
+          credentials: 'include',
           headers: {
             'Accept': 'application/json',
           },

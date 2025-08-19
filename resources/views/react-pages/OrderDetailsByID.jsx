@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import OrderDetailsPage from './components/order-details/OrderDetailsPage';
-import SmoothFollower from './components/Cursor';
-import Navbar from "./components/Navbar";
+import OrderDetailsPage from '../components/order-details/OrderDetailsPage';
+import SmoothFollower from '../components/Cursor';
+import Navbar from "../components/Navbar";
 
 const OrderDetailsByID = () => {
     const [order, setOrder] = useState(null);

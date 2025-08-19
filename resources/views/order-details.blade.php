@@ -5,7 +5,7 @@
     <link rel="icon" href="../images/logo.png" type="image/svg+xml">
     <title>Order Details</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/css/app.css', 'resources/views/OrderDetailsByID.jsx'])
+    @vite(['resources/css/app.css', 'resources/views/react-pages/OrderDetailsByID.jsx'])
 </head>
 
 <body>

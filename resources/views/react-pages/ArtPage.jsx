@@ -2,13 +2,13 @@ import React, { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import ReactDOM from 'react-dom/client';
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import HeroSection from './components/art/HeroSection'
-import ShowcaseSection from './components/art/ShowcaseSection'
-import GallerySection from './components/art/GallerySection'
-import StatementSection from './components/art/StatementSection'
-import Separator from './components/art/Separator'
-import Navbar from "./components/Navbar";
-import SmoothFollower from "./components/Cursor";
+import HeroSection from '../components/art/HeroSection'
+import ShowcaseSection from '../components/art/ShowcaseSection'
+import GallerySection from '../components/art/GallerySection'
+import StatementSection from '../components/art/StatementSection'
+import Separator from '../components/art/Separator'
+import Navbar from "../components/Navbar";
+import SmoothFollower from "../components/Cursor";
 
 gsap.registerPlugin(ScrollTrigger)
 

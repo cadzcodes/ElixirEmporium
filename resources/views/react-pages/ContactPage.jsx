@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ReactDOM from 'react-dom/client';
-import Navbar from "./components/Navbar";
-import AccordionItem from "./components/contact/AccordionItem";
-import SmoothFollower from "./components/Cursor";
-import AlertDialog from "./components/reusables/AlertDialog";
+import Navbar from "../components/Navbar";
+import AccordionItem from "../components/contact/AccordionItem";
+import SmoothFollower from "../components/Cursor";
+import AlertDialog from "../components/reusables/AlertDialog";
 
 
 gsap.registerPlugin(ScrollTrigger)

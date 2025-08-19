@@ -2,11 +2,11 @@ import React, { useRef, useState, useEffect, useLayoutEffect } from 'react'
 import gsap from 'gsap'
 import ReactDOM from 'react-dom/client';
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import SignupForm from "./components/signup/SignupForm"
-import BenefitSection from "./components/signup/BenefitSection"
-import Toast from "./components/signup/Toast"
-import Navbar from "./components/Navbar";
-import SmoothFollower from "./components/Cursor";
+import SignupForm from "../components/signup/SignupForm"
+import BenefitSection from "../components/signup/BenefitSection"
+import Toast from "../components/signup/Toast"
+import Navbar from "../components/Navbar";
+import SmoothFollower from "../components/Cursor";
 
 
 gsap.registerPlugin(ScrollTrigger)

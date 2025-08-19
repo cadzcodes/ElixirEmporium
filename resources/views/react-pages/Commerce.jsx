@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client';
-import Navbar from "./components/Navbar";
-import SearchBar from "./components/cocktails/SearchBar";
-import CocktailGrid from "./components/cocktails/CocktailGrid";
-import SmoothFollower from "./components/Cursor";
+import Navbar from "../components/Navbar";
+import SearchBar from "../components/cocktails/SearchBar";
+import CocktailGrid from "../components/cocktails/CocktailGrid";
+import SmoothFollower from "../components/Cursor";
 
 const Commerce = () => {
     const [searchTerm, setSearchTerm] = useState('');

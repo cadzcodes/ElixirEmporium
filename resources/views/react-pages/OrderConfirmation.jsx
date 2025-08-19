@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import gsap from 'gsap';
 import { CheckCircle } from 'lucide-react';
 import { BrowserRouter } from 'react-router-dom';
-import SmoothFollower from "./components/Cursor";
+import SmoothFollower from "../components/Cursor";
 
 const OrderConfirmation = () => {
     const [order, setOrder] = useState(null);

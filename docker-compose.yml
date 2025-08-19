@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  laravel:
+    image: demo/laravel:0.1
+    container_name: laravel
+    working_dir: /var/www
+    volumes:
+      - laraveldata:/var/www    # Full Laravel project inside named volume
+    networks:
+      - appnet
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    user: root
+    volumes:
+      - laraveldata:/var/www:cached
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    networks:
+      - appnet
+    depends_on:
+      - laravel
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - appnet
+  
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin_app
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+      PMA_PORT: 3306
+    ports:
+     - "8000:80"
+    depends_on:
+     - mysql
+    networks:
+     - appnet
+
+
+volumes:
+  laraveldata:
+  dbdata:
+
+networks:
+  appnet:

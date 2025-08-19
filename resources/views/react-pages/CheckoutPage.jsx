@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Navbar from "./components/Navbar";
-import CheckoutForm from "./components/checkout/CheckoutForm";
-import SmoothFollower from "./components/Cursor";
+import Navbar from "../components/Navbar";
+import CheckoutForm from "../components/checkout/CheckoutForm";
+import SmoothFollower from "../components/Cursor";
 
 const CheckoutPage = () => {
     return (

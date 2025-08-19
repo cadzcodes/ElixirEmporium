@@ -122,3 +122,8 @@ Route::get('/payment/success/{order}', [OrderController::class, 'paypalSuccess']
 Route::get('/payment/cancel/{order}', [OrderController::class, 'paypalCancel'])->name('payment.cancel');
 
 Route::post('/contact', [ContactController::class, 'send']);
+
+Route::get('/test-cookie', function () {
+    setcookie('test', 'value', time() + 3600, '/', '.elixiremporium.test');
+    return response('Cookie set')->cookie('laravel_test', 'working');
+});

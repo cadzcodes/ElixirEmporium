@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import ProfileTab from "./components/my-account/ProfileTab";
-import AddressBook from "./components/my-account/AddressBook";
-import MyOrders from "./components/my-account/MyOrders";
-import Navbar from "./components/Navbar";
+import ProfileTab from "../components/my-account/ProfileTab";
+import AddressBook from "../components/my-account/AddressBook";
+import MyOrders from "../components/my-account/MyOrders";
+import Navbar from "../components/Navbar";
 import { AlertTriangle } from 'lucide-react';
-import SmoothFollower from "./components/Cursor";
+import SmoothFollower from "../components/Cursor";
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState(window.__DEFAULT_TAB__ || 'profile');

@@ -4,7 +4,7 @@
     <link rel="icon" href="../images/logo.png" type="image/svg+xml">
     <title>{{ $product->name }} - Elixir Emporium</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/css/app.css', 'resources/views/Product.jsx'])
+    @vite(['resources/css/app.css', 'resources/views/react-pages/Product.jsx'])
 </head>
 <body>
     <div id="product"></div>

@@ -77,6 +77,7 @@ const LoginPage = () => {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         },
+        credentials: 'include',
         body: JSON.stringify(formData)
       });
 
