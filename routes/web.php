@@ -127,3 +127,6 @@ Route::get('/test-cookie', function () {
     setcookie('test', 'value', time() + 3600, '/', '.elixiremporium.test');
     return response('Cookie set')->cookie('laravel_test', 'working');
 });
+
+Route::post('/verify', [AuthController::class, 'verify'])->name('verify');
+Route::post('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');

@@ -24,6 +24,9 @@ class User extends Authenticatable
         'phone',
         'gender',
         'date_of_birth',
+        'is_verified',
+        'verification_code',
+        'verification_expires_at',
     ];
 
 
@@ -49,6 +52,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected $casts = [
+        'is_verified' => 'boolean',
+        'verification_expires_at' => 'datetime',
+    ];
 
     public function cartItems()
     {
