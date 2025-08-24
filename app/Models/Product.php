@@ -14,7 +14,7 @@ class Product extends Model
         'sale_price',
         'image',
         'tags',
-        'availability'
+        'stocks'
     ];
 
     // Automatically generate slug from name

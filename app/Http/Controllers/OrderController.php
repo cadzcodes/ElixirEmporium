@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\CartItem;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Services\Payments\PaymentGatewayManager;
@@ -32,47 +33,56 @@ class OrderController extends Controller
         $shippingFee = 100;
         $total = $subtotal + $shippingFee;
 
-        $order = Order::create([
-            'user_id' => $user->id,
-            'address_id' => $shippingId,
-            'payment_method' => $paymentMethod,
-            'subtotal' => $subtotal,
-            'shipping_fee' => $shippingFee,
-            'total' => $total,
-            'status' => 'pending',
-            'eta' => now()->addDays(3),
-        ]);
-
-        foreach ($items as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['price'],
-                'subtotal' => $item['price'] * $item['quantity'],
-            ]);
-        }
-
-        // Send confirmation email...
-        Mail::send('emails.order_confirmation', [
-            'user' => $user,
-            'order' => $order,
-            'items' => $items
-        ], function ($mail) use ($user, $order) {
-            $mail->to($user->email, $user->name)
-                ->subject('Order Confirmation - Order #' . $order->id);
-        });
-
-        // Remove from cart
-        CartItem::where('user_id', $user->id)
-            ->whereIn('product_id', collect($items)->pluck('product_id'))
-            ->delete();
-
-        // ✅ Get correct gateway based on $paymentMethod
-        $gateway = $this->paymentGatewayManager->resolve($paymentMethod);
+        DB::beginTransaction(); // ✅ wrap in transaction to avoid half-updates
 
         try {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'address_id' => $shippingId,
+                'payment_method' => $paymentMethod,
+                'subtotal' => $subtotal,
+                'shipping_fee' => $shippingFee,
+                'total' => $total,
+                'status' => 'pending',
+                'eta' => now()->addDays(3),
+            ]);
+
+            foreach ($items as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['price'],
+                    'subtotal' => $item['price'] * $item['quantity'],
+                ]);
+
+                // ✅ decrement stock
+                Product::where('id', $item['product_id'])
+                    ->where('stocks', '>=', $item['quantity']) // prevent negative stock
+                    ->decrement('stocks', $item['quantity']);
+            }
+
+            // Send confirmation email...
+            Mail::send('emails.order_confirmation', [
+                'user' => $user,
+                'order' => $order,
+                'items' => $items
+            ], function ($mail) use ($user, $order) {
+                $mail->to($user->email, $user->name)
+                    ->subject('Order Confirmation - Order #' . $order->id);
+            });
+
+            // Remove from cart
+            CartItem::where('user_id', $user->id)
+                ->whereIn('product_id', collect($items)->pluck('product_id'))
+                ->delete();
+
+            // ✅ Get correct gateway
+            $gateway = $this->paymentGatewayManager->resolve($paymentMethod);
+
             $redirectUrl = $gateway->createCheckout($order, $total);
+
+            DB::commit(); // ✅ commit only after everything passes
 
             if ($redirectUrl) {
                 return response()->json(['redirect_url' => $redirectUrl]);
@@ -83,13 +93,13 @@ class OrderController extends Controller
                 'order_id' => $order->id
             ]);
         } catch (\Exception $e) {
+            DB::rollBack(); // ❌ rollback on error
+
             return response()->json([
-                'error' => 'Payment failed: ' . $e->getMessage(),
-                'order_id' => $order->id
+                'error' => 'Order failed: ' . $e->getMessage()
             ], 500);
         }
     }
-
     public function paymentSuccess(Request $request, $orderId)
     {
         $order = Order::findOrFail($orderId);
