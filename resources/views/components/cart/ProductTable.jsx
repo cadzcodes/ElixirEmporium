@@ -1,5 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import FancyCheckbox from "../reusables/FancyCheckbox";
+
+const QuantityInput = ({ quantity, onChange }) => {
+    const [tempQty, setTempQty] = useState(quantity);
+
+    useEffect(() => {
+        setTempQty(quantity);
+    }, [quantity]);
+
+    const handleBlur = () => {
+        let newQty = parseInt(tempQty, 10);
+        if (isNaN(newQty) || newQty < 1) newQty = 1;
+        if (newQty > 10) newQty = 10;
+        setTempQty(newQty);
+        if (newQty !== quantity) onChange(newQty - quantity);
+    };
+
+    const handleChange = (e) => {
+        setTempQty(e.target.value); // allow free typing
+    };
+
+    return (
+        <input
+            type="number"
+            min="1"
+            max="10"
+            value={tempQty}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    e.target.blur();
+                }
+            }}
+            className="w-16 text-center bg-[#2a2a2a] border border-yellow/30 rounded-lg text-white text-lg 
+        focus:ring-2 focus:ring-yellow focus:outline-none 
+        appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+    );
+};
 
 const ProductTable = ({
     cartItems,
@@ -33,7 +73,7 @@ const ProductTable = ({
                     id={`cart-item-${item.id}`}
                     onClick={() => onSelect(item.id)}
                     className={`cursor-pointer bg-[#1a1a1a] p-5 md:p-7 rounded-2xl shadow-xl border border-yellow/20 transition-all duration-300 hover:bg-[#1f1f1f] 
-    ${item.selected ? "ring-2 ring-yellow" : ""}`}
+          ${item.selected ? "ring-2 ring-yellow" : ""}`}
                 >
                     <div className="grid md:grid-cols-12 gap-4">
                         {/* Product */}
@@ -77,25 +117,11 @@ const ProductTable = ({
                                 -
                             </button>
 
-                            <input
-                                type="number"
-                                min="1"
-                                max="10"
-                                value={item.quantity}
-                                onChange={(e) => {
-                                    e.stopPropagation();
-                                    let newQty = parseInt(e.target.value, 10);
-                                    if (isNaN(newQty)) newQty = 1;
-                                    if (newQty < 1) newQty = 1;
-                                    if (newQty > 10) newQty = 10;
-                                    onQuantityChange(
-                                        item.id,
-                                        newQty - item.quantity
-                                    );
-                                }}
-                                className="w-16 text-center bg-[#2a2a2a] border border-yellow/30 rounded-lg text-white text-lg 
-               focus:ring-2 focus:ring-yellow focus:outline-none 
-               appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            <QuantityInput
+                                quantity={item.quantity}
+                                onChange={(delta) =>
+                                    onQuantityChange(item.id, delta)
+                                }
                             />
 
                             <button
@@ -154,26 +180,11 @@ const ProductTable = ({
                                     -
                                 </button>
 
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="10"
-                                    value={item.quantity}
-                                    onChange={(e) => {
-                                        e.stopPropagation();
-                                        let newQty = parseInt(
-                                            e.target.value,
-                                            10
-                                        );
-                                        if (isNaN(newQty)) newQty = 1;
-                                        if (newQty < 1) newQty = 1;
-                                        if (newQty > 10) newQty = 10;
-                                        onQuantityChange(
-                                            item.id,
-                                            newQty - item.quantity
-                                        );
-                                    }}
-                                    className="w-14 text-center bg-black/30 border border-yellow/40 rounded-lg text-white text-lg focus:ring-2 focus:ring-yellow focus:outline-none"
+                                <QuantityInput
+                                    quantity={item.quantity}
+                                    onChange={(delta) =>
+                                        onQuantityChange(item.id, delta)
+                                    }
                                 />
 
                                 <button
