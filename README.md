@@ -9,7 +9,7 @@
   🛍️ Customer Store • 🏪 Admin CMS • 🔌 API Backend
   
   ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=white)
-  ![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+  ![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
   ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
   ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
   
@@ -164,7 +164,7 @@ docker-compose exec backend php artisan migrate --seed
 
 **Backend**
 
--   🐘 Laravel 11
+-   🐘 Laravel 12
 -   🗄️ MySQL 8.0
 -   🔐 Laravel Sanctum
 -   📧 Laravel Mail
