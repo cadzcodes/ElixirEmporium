@@ -13,8 +13,8 @@
   ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
   ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
   
-  [![Build Status](https://img.shields.io/github/workflow/status/yourusername/ElixirEmporium/CI?style=for-the-badge)](https://github.com/yourusername/ElixirEmporium/actions)
-  [![Contributors](https://img.shields.io/github/contributors/yourusername/ElixirEmporium?style=for-the-badge)](https://github.com/yourusername/ElixirEmporium/graphs/contributors)
+  [![Build Status](https://img.shields.io/github/workflow/status/cadzcodes/ElixirEmporium/CI?style=for-the-badge)](https://github.com/cadzcodes/ElixirEmporium/actions)
+  [![Contributors](https://img.shields.io/github/contributors/cadzcodes/ElixirEmporium?style=for-the-badge)](https://github.com/cadzcodes/ElixirEmporium/graphs/contributors)
   
 </div>
 
@@ -79,7 +79,7 @@ Ensure you have the following installed:
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/ElixirEmporium.git
+git clone https://github.com/cadzcodes/ElixirEmporium.git
 cd ElixirEmporium
 ```
 
@@ -133,7 +133,7 @@ npm run dev
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ElixirEmporium.git
+git clone https://github.com/cadzcodes/ElixirEmporium.git
 cd ElixirEmporium
 
 # Build and start containers
@@ -279,7 +279,7 @@ sudo apt install nginx mysql-server php8.1-fpm composer nodejs npm git -y
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/ElixirEmporium.git /var/www/elixir-emporium
+git clone https://github.com/cadzcodes/ElixirEmporium.git /var/www/elixir-emporium
 cd /var/www/elixir-emporium
 
 # Backend deployment
@@ -473,7 +473,7 @@ of this software and associated documentation files...
 
 **Need Help?**
 
-[![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-red?style=for-the-badge&logo=github)](https://github.com/yourusername/ElixirEmporium/issues)
+[![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-red?style=for-the-badge&logo=github)](https://github.com/cadzcodes/ElixirEmporium/issues)
 [![Discord](https://img.shields.io/badge/Discord-Chat-blue?style=for-the-badge&logo=discord)](https://discord.gg/your-server)
 [![Documentation](https://img.shields.io/badge/Docs-Read-green?style=for-the-badge&logo=gitbook)](https://docs.elixiremporium.com)
 
