@@ -10,10 +10,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductController extends Controller
 {
+    protected $apiBase;
+
+    public function __construct()
+    {
+        $this->apiBase = config('services.python_api.base_url'); // fetch from .env via config
+    }
+
     // Return a single product as JSON by slug
     public function show($slug)
     {
-        $response = Http::get("http://127.0.0.1:8000/products/{$slug}");
+        $response = Http::get("{$this->apiBase}/products/{$slug}");
 
         if ($response->status() === 404) {
             throw new NotFoundHttpException('Product not found');
@@ -25,9 +32,11 @@ class ProductController extends Controller
 
         return response()->json($response->json());
     }
+
+    // Return all products
     public function index()
     {
-        $response = Http::get("http://127.0.0.1:8000/products");
+        $response = Http::get("{$this->apiBase}/products");
 
         if ($response->failed()) {
             abort(500, 'Python API unavailable');
@@ -35,5 +44,4 @@ class ProductController extends Controller
 
         return $response->json();
     }
-
 }

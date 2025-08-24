@@ -15,7 +15,7 @@ class CartController extends Controller
         $apiBase = config('services.python_api.base_url');
 
         $response = Http::get($apiBase . "/cart/" . Auth::id());
-        
+
         if ($response->failed()) {
             abort(500, 'Python API unavailable');
         }
@@ -32,14 +32,14 @@ class CartController extends Controller
 
         $user = auth()->user();
 
-        $cartItem = \App\Models\CartItem::where('user_id', $user->id)
+        $cartItem = CartItem::where('user_id', $user->id)
             ->where('product_id', $request->product_id)
             ->first();
 
         if ($cartItem) {
             $cartItem->increment('quantity', $request->quantity);
         } else {
-            \App\Models\CartItem::create([
+            CartItem::create([
                 'user_id' => $user->id,
                 'product_id' => $request->product_id,
                 'quantity' => $request->quantity,
