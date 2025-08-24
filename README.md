@@ -1,6 +1,6 @@
 # ✨ Elixir Emporium
 
-![Elixir Emporium Banner](public/images/mockup.png)
+![Elixir Emporium Banner](public/images/Mockup.png)
 
 <div align="center">
   
