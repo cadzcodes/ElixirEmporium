@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AlertDialog from "./AlertDialog"; // import your AlertDialog
 
 const VerificationDialog = ({ userId, onSuccess }) => {
     const [code, setCode] = useState("");
@@ -6,10 +7,21 @@ const VerificationDialog = ({ userId, onSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [resending, setResending] = useState(false);
     const [message, setMessage] = useState(null);
+    const [alert, setAlert] = useState(null);
+    const [cooldown, setCooldown] = useState(0);
 
     const token = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
+
+    // Countdown for resend cooldown
+    React.useEffect(() => {
+        let timer;
+        if (cooldown > 0) {
+            timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
+        }
+        return () => clearInterval(timer);
+    }, [cooldown]);
 
     const handleVerify = async (e) => {
         e.preventDefault();
@@ -30,23 +42,54 @@ const VerificationDialog = ({ userId, onSuccess }) => {
             const data = await res.json();
 
             if (res.ok) {
+                setAlert({
+                    type: "success",
+                    message: "Email verified successfully!",
+                });
                 onSuccess();
             } else {
-                setError(data.message || "Verification failed");
+                setAlert({
+                    type: "error",
+                    message: data.message || "Verification failed",
+                });
             }
         } catch (err) {
-            setError("Something went wrong");
+            setAlert({ type: "error", message: "Something went wrong" });
         } finally {
             setLoading(false);
         }
     };
 
     const handleResend = async () => {
+        if (cooldown > 0) return;
+
         setError(null);
         setMessage(null);
         setResending(true);
 
         try {
+            // Check first if code is still valid
+            const checkRes = await fetch("/check-code", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token,
+                },
+                body: JSON.stringify({ user_id: userId }),
+            });
+
+            const checkData = await checkRes.json();
+
+            if (checkRes.ok && checkData.valid) {
+                setAlert({
+                    type: "error",
+                    message: "You already have a valid code.",
+                });
+                setResending(false);
+                return;
+            }
+
+            // Otherwise, resend
             const res = await fetch("/resend-code", {
                 method: "POST",
                 headers: {
@@ -59,12 +102,19 @@ const VerificationDialog = ({ userId, onSuccess }) => {
             const data = await res.json();
 
             if (res.ok) {
-                setMessage("A new code has been sent to your email.");
+                setAlert({
+                    type: "success",
+                    message: "A new code has been sent to your email.",
+                });
+                setCooldown(60); // 60s cooldown
             } else {
-                setError(data.message || "Failed to resend code");
+                setAlert({
+                    type: "error",
+                    message: data.message || "Failed to resend code",
+                });
             }
         } catch (err) {
-            setError("Something went wrong");
+            setAlert({ type: "error", message: "Something went wrong" });
         } finally {
             setResending(false);
         }
@@ -115,12 +165,24 @@ const VerificationDialog = ({ userId, onSuccess }) => {
 
                 <button
                     onClick={handleResend}
-                    disabled={resending}
+                    disabled={resending || cooldown > 0}
                     className="w-full text-sm text-gray-400 hover:text-yellow mt-2"
                 >
-                    {resending ? "Resending..." : "Resend Code"}
+                    {resending
+                        ? "Resending..."
+                        : cooldown > 0
+                        ? `Resend available in ${cooldown}s`
+                        : "Resend Code"}
                 </button>
             </div>
+
+            {alert && (
+                <AlertDialog
+                    type={alert.type}
+                    message={alert.message}
+                    onClose={() => setAlert(null)}
+                />
+            )}
         </div>
     );
 };

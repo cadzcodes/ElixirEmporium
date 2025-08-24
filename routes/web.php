@@ -130,3 +130,4 @@ Route::get('/test-cookie', function () {
 
 Route::post('/verify', [AuthController::class, 'verify'])->name('verify');
 Route::post('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');
+Route::post('/check-code', [AuthController::class, 'checkCodeValid'])->name('verification.check');

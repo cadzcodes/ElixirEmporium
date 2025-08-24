@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
 
 class AuthController extends Controller
 {
@@ -148,5 +150,41 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Verification code resent successfully']);
     }
+
+    public function checkCodeValid(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
+
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        if ($user->is_verified) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'User is already verified',
+            ], 400);
+        }
+
+        if ($user->verification_expires_at && $user->verification_expires_at->isFuture()) {
+            return response()->json([
+                'valid' => true,
+                'message' => 'Current code is still valid',
+            ]);
+        }
+
+        return response()->json([
+            'valid' => false,
+            'message' => 'No valid code, can resend',
+        ]);
+    }
+
 
 }
