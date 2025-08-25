@@ -252,6 +252,13 @@ const LoginPage = () => {
                             />
                             Remember me
                         </label>
+
+                        <a
+                            href="/forgot-password"
+                            className="text-yellow hover:underline"
+                        >
+                            Forgot Password?
+                        </a>
                     </div>
 
                     <button

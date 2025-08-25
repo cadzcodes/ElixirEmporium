@@ -27,6 +27,7 @@ class User extends Authenticatable
         'is_verified',
         'verification_code',
         'verification_expires_at',
+        'reset_code',
     ];
 
 
@@ -56,7 +57,10 @@ class User extends Authenticatable
     protected $casts = [
         'is_verified' => 'boolean',
         'verification_expires_at' => 'datetime',
+        'reset_expires_at' => 'datetime',
     ];
+
+    protected $dates = ['reset_expires_at'];
 
     public function cartItems()
     {

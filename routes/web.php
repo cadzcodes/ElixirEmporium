@@ -30,6 +30,7 @@ Route::get('/account', function (Request $request) {
 })->middleware(RedirectIfGuestToHome::class);
 Route::view('/cart', 'cart');
 Route::view('/checkout', 'checkout');
+Route::view('/forgot-password', 'auth.forgot-password');
 Route::view('/signup', 'auth.signup')->middleware(RedirectIfAuthenticatedToHome::class);
 Route::view('/login', 'auth.login')->middleware(RedirectIfAuthenticatedToHome::class);
 Route::view('/orderdetails', 'order-details');
@@ -131,3 +132,12 @@ Route::get('/test-cookie', function () {
 Route::post('/verify', [AuthController::class, 'verify'])->name('verify');
 Route::post('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');
 Route::post('/check-code', [AuthController::class, 'checkCodeValid'])->name('verification.check');
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/forgot-password/verify', [AuthController::class, 'verifyResetCode']);
+
+Route::get('/reset-password', function () {
+    return view('auth.reset-password');
+})->name('password.reset');
+
+Route::post('/reset-password', [AuthController::class, 'reset']);
