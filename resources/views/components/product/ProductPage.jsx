@@ -44,15 +44,29 @@ const ProductPage = () => {
                 }),
             });
 
+            const data = await res.json(); // <-- parse JSON always
             const id = Date.now();
 
             if (res.ok) {
+                // Decide alert type
+                let alertType = "success";
+                if (typeof data.added === "number") {
+                    if (data.added === 0) {
+                        alertType = "error"; // no item added at all
+                    } else if (data.added < quantity) {
+                        alertType = "warning"; // partial add (clamped)
+                    }
+                }
+
                 setAlerts((prev) => [
                     ...prev,
-                    { id, type: "success", message: "Added to cart!" },
+                    {
+                        id,
+                        type: alertType,
+                        message: data.message || "Added to cart!",
+                    },
                 ]);
             } else {
-                const data = await res.json();
                 setAlerts((prev) => [
                     ...prev,
                     {
@@ -74,11 +88,25 @@ const ProductPage = () => {
         }
     };
 
-    const increment = () => setQuantity((prev) => prev + 1);
+    const [inputValue, setInputValue] = useState(quantity);
+
+    useEffect(() => {
+        // sync if quantity changes elsewhere
+        setInputValue(quantity);
+    }, [quantity]);
+
+    const increment = () => setQuantity((prev) => (prev < 10 ? prev + 1 : 10));
     const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-    const handleManualChange = (e) => {
-        const val = parseInt(e.target.value);
-        if (!isNaN(val) && val > 0) setQuantity(val);
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value); // allow free typing
+    };
+
+    const commitQuantity = () => {
+        const val = parseInt(inputValue, 10);
+        if (isNaN(val) || val < 1) setQuantity(1);
+        else if (val > 10) setQuantity(10);
+        else setQuantity(val);
     };
 
     return (
@@ -138,8 +166,12 @@ const ProductPage = () => {
                                 ref={qtyRef}
                                 type="text"
                                 inputMode="numeric"
-                                value={quantity}
-                                onChange={handleManualChange}
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                onBlur={commitQuantity}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") commitQuantity();
+                                }}
                                 disabled={isOutOfStock}
                                 className="w-12 text-center text-white bg-transparent outline-none disabled:cursor-not-allowed"
                             />

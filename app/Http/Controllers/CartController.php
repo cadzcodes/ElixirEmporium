@@ -37,16 +37,40 @@ class CartController extends Controller
             ->first();
 
         if ($cartItem) {
-            $cartItem->increment('quantity', $request->quantity);
+            $remaining = 10 - $cartItem->quantity;
+
+            if ($remaining <= 0) {
+                // Already at max
+                return response()->json([
+                    'message' => 'You already reached the max quantity (10) for this item.',
+                    'added' => 0,
+                    'current' => $cartItem->quantity,
+                ], 200);
+            }
+
+            $toAdd = min($request->quantity, $remaining);
+            $cartItem->increment('quantity', $toAdd);
+
+            return response()->json([
+                'message' => "Added {$toAdd} more to cart (max 10 per item).",
+                'added' => $toAdd,
+                'current' => $cartItem->quantity + $toAdd,
+            ], 200);
         } else {
-            CartItem::create([
+            // New item
+            $toAdd = min($request->quantity, 10);
+            $cartItem = CartItem::create([
                 'user_id' => $user->id,
                 'product_id' => $request->product_id,
-                'quantity' => $request->quantity,
+                'quantity' => $toAdd,
             ]);
-        }
 
-        return response()->json(['message' => 'Added to cart'], 200);
+            return response()->json([
+                'message' => "Added {$toAdd} to cart (max 10 per item).",
+                'added' => $toAdd,
+                'current' => $toAdd,
+            ], 200);
+        }
     }
 
 
