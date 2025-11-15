@@ -22,9 +22,13 @@ const MyOrders = () => {
             });
     }, []);
 
-    const filtered = filter === 'All'
-        ? orders
-        : orders.filter(order => order.status === filter);
+    // ✅ Case-insensitive filter
+    const filtered =
+        filter === 'All'
+            ? orders
+            : orders.filter(order =>
+                order.status?.toLowerCase() === filter.toLowerCase()
+            );
 
     const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
     const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -40,6 +44,9 @@ const MyOrders = () => {
     }, [filter]);
 
     if (loading) return <div className="text-white mt-10 text-center">Loading orders...</div>;
+
+    // ✅ Helper to capitalize
+    const capitalize = (text = '') => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 
     return (
         <div className="space-y-6 px-4 max-w-5xl mx-auto">
